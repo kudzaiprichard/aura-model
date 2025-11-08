@@ -1,0 +1,22 @@
+# DataSpell IDE
+.idea/
+.dataspell/
+
+# AI Model files
+models/
+*.h5
+*.pkl
+*.pth
+*.pt
+*.onnx
+*.pb
+*.tflite
+
+# Datasets
+datasets/
+data/
+*.csv
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb_checkpoints

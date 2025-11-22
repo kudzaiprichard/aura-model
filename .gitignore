@@ -4,6 +4,7 @@
 
 # AI Model files
 models/
+results/
 *.h5
 *.pkl
 *.pth

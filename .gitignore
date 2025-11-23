@@ -5,6 +5,7 @@
 # AI Model files
 models/
 results/
+lookup_tables/
 *.h5
 *.pkl
 *.pth

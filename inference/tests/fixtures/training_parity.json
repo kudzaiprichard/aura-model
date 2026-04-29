@@ -1,0 +1,4873 @@
+{
+  "metadata": {
+    "engineered_feature_order": [
+      "body_word_count",
+      "body_exclamation_count",
+      "email_local_length",
+      "name_email_consistency",
+      "body_url_density",
+      "body_url_count",
+      "body_entropy",
+      "email_digit_ratio",
+      "domain_entropy",
+      "domain_length",
+      "subject_entropy",
+      "body_avg_word_length",
+      "sender_name_exists",
+      "subject_exclamation_count",
+      "domain_vowel_consonant_ratio"
+    ],
+    "subject_tfidf_dim": 2000,
+    "body_tfidf_dim": 5000,
+    "total_features": 7015,
+    "vectorizer_fingerprint": {
+      "subject": "395011bbbccb4f435ec109cacea7144aa10546d26c3cb30b78ca2beaed27c241",
+      "body": "5b8cfb48a250929d4da1b46ae08e4addf969e7125ea79846e6a40f9620414cc5"
+    },
+    "notebook_commit": "0df45da69a927ff870208463214178b1ba1ecedf",
+    "source_dataset": "datasets/processed/cleaned_email_dataset.csv"
+  },
+  "records": [
+    {
+      "id": 0,
+      "label": 1,
+      "sender": "Ganesh <upwellin@rpinstal.pl>",
+      "subject": "Helping Men with low sex drives",
+      "body": "Grow longer and harder with our all natural supplement http://www.fiftyday.com/ Using Opera s revolutionary e mail client http://www.opera.com/mail/",
+      "normalized": {
+        "subject": "helping men with low sex drives",
+        "body": "grow longer and harder with our all natural supplement using opera s revolutionary e mail client"
+      },
+      "engineered_features": {
+        "body_word_count": 18.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 8.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 22.22222222222222,
+        "body_url_count": 4.0,
+        "body_entropy": 4.319390699484569,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.0,
+        "domain_length": 11.0,
+        "subject_entropy": 3.8252517372886503,
+        "body_avg_word_length": 7.277777777777778,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.25
+      },
+      "subject_tfidf_nonzero": [
+        [
+          548,
+          0.5178202404598309
+        ],
+        [
+          805,
+          0.5203420222548374
+        ],
+        [
+          1017,
+          0.3668683937788461
+        ],
+        [
+          1077,
+          0.3538643749840103
+        ],
+        [
+          1589,
+          0.44865795903914896
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          962,
+          0.3118145128177144
+        ],
+        [
+          2030,
+          0.4008391164379551
+        ],
+        [
+          2076,
+          0.3989948024646441
+        ],
+        [
+          2647,
+          0.2938095240456579
+        ],
+        [
+          2718,
+          0.21223782967699417
+        ],
+        [
+          2988,
+          0.3328641529981098
+        ],
+        [
+          3838,
+          0.38913019709263724
+        ],
+        [
+          4367,
+          0.3823359121308163
+        ],
+        [
+          4728,
+          0.20768322711366666
+        ]
+      ]
+    },
+    {
+      "id": 1,
+      "label": 0,
+      "sender": "Tyler Smith <tyler.smith@mail.mcgill.ca>",
+      "subject": "my ugly apply sweep code needs help",
+      "body": "sweep.med ian2 sweep.med f FALSE do.call rbind lapply group.sel f Thanks for this very helpful! Tyler R help stat.math.ethz ch mailing list https://stat.ethz.ch/mailman/listinfo/r-help PLEASE do read the posting guide http://www.R-project.org/posting-guide.html and provide commented minimal self contained reproducible code",
+      "normalized": {
+        "subject": "my ugly apply sweep code needs help",
+        "body": "sweep.med ian2 sweep.med f false do.call rbind lapply group.sel f thanks for this very helpful tyler r help stat.math.ethz ch mailing list please do read the posting guide and provide commented minimal self contained reproducible code"
+      },
+      "engineered_features": {
+        "body_word_count": 38.0,
+        "body_exclamation_count": 1.0,
+        "email_local_length": 11.0,
+        "name_email_consistency": 1.0,
+        "body_url_density": 7.894736842105263,
+        "body_url_count": 3.0,
+        "body_entropy": 4.454780354694882,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.663532754804255,
+        "domain_length": 14.0,
+        "subject_entropy": 3.5814447879326115,
+        "body_avg_word_length": 7.552631578947368,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.5
+      },
+      "subject_tfidf_nonzero": [
+        [
+          158,
+          0.5956658377908435
+        ],
+        [
+          344,
+          0.443957011557926
+        ],
+        [
+          803,
+          0.3790594307174938
+        ],
+        [
+          1135,
+          0.5517230551296708
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          879,
+          0.16350094578505103
+        ],
+        [
+          880,
+          0.1663254124008282
+        ],
+        [
+          989,
+          0.1372212662893595
+        ],
+        [
+          1025,
+          0.16360363355165164
+        ],
+        [
+          1026,
+          0.16483393083165782
+        ],
+        [
+          1121,
+          0.1601838283393619
+        ],
+        [
+          1122,
+          0.16483393083165782
+        ],
+        [
+          1640,
+          0.16622341058959
+        ],
+        [
+          1641,
+          0.16622341058959
+        ],
+        [
+          1744,
+          0.23425324968474365
+        ],
+        [
+          2027,
+          0.18887544447892754
+        ],
+        [
+          2041,
+          0.15983662161962928
+        ],
+        [
+          2042,
+          0.16489036405393978
+        ],
+        [
+          2112,
+          0.12617670836432213
+        ],
+        [
+          2115,
+          0.1662452480867205
+        ],
+        [
+          2117,
+          0.26644903011634596
+        ],
+        [
+          2589,
+          0.11398783453811379
+        ],
+        [
+          2594,
+          0.16472831456233633
+        ],
+        [
+          2724,
+          0.12534923617272548
+        ],
+        [
+          2725,
+          0.12643359897702489
+        ],
+        [
+          2795,
+          0.16448286475313628
+        ],
+        [
+          2796,
+          0.16623068854288048
+        ],
+        [
+          2875,
+          0.16378219929298649
+        ],
+        [
+          2876,
+          0.16483393083165782
+        ],
+        [
+          3421,
+          0.16177146834531303
+        ],
+        [
+          3422,
+          0.1648127871474626
+        ],
+        [
+          3568,
+          0.14278925144689925
+        ],
+        [
+          3569,
+          0.16483393083165782
+        ],
+        [
+          3661,
+          0.13741657597951698
+        ],
+        [
+          3663,
+          0.16479869703918915
+        ],
+        [
+          3781,
+          0.1647423819921799
+        ],
+        [
+          3782,
+          0.16483393083165782
+        ],
+        [
+          3994,
+          0.153155892186128
+        ],
+        [
+          3995,
+          0.16463698648221745
+        ],
+        [
+          4243,
+          0.1651807336965485
+        ],
+        [
+          4244,
+          0.16623068854288048
+        ],
+        [
+          4493,
+          0.14027485072421164
+        ]
+      ]
+    },
+    {
+      "id": 2,
+      "label": 0,
+      "sender": "Follower <follower@rancidbacon.com>",
+      "subject": "Getting sugar running on a Mac",
+      "body": "Steven W Riggins wrote I ve tried Q Qemu and parallels 385 just crashes the parallels VM and the live images are not bootable according to Q Are you using this Phil Sugar mailing list Sugar laptop.org http://mailman.laptop.org/mailman/listinfo/sugar",
+      "normalized": {
+        "subject": "getting sugar running on a mac",
+        "body": "steven w riggins wrote i ve tried q qemu and parallels 385 just crashes the parallels vm and the live images are not bootable according to q are you using this phil sugar mailing list sugar laptop.org"
+      },
+      "engineered_features": {
+        "body_word_count": 38.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 8.0,
+        "name_email_consistency": 1.0,
+        "body_url_density": 2.631578947368421,
+        "body_url_count": 1.0,
+        "body_entropy": 4.3332822479002635,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.9139770731827523,
+        "domain_length": 15.0,
+        "subject_entropy": 3.3492750707107133,
+        "body_avg_word_length": 5.578947368421052,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.5555555555555556
+      },
+      "subject_tfidf_nonzero": [
+        [
+          737,
+          0.47160067320915505
+        ],
+        [
+          1024,
+          0.5127993294816011
+        ],
+        [
+          1522,
+          0.48761621905163366
+        ],
+        [
+          1715,
+          0.5261749477404652
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          318,
+          0.2293002521279433
+        ],
+        [
+          2229,
+          0.28330021521217785
+        ],
+        [
+          2425,
+          0.12631367125077297
+        ],
+        [
+          2497,
+          0.25523061959515453
+        ],
+        [
+          2498,
+          0.29133288137238555
+        ],
+        [
+          2589,
+          0.11940450044526675
+        ],
+        [
+          2597,
+          0.29428726790123805
+        ],
+        [
+          2610,
+          0.20927844957551206
+        ],
+        [
+          2724,
+          0.13130579229834818
+        ],
+        [
+          2725,
+          0.13244168368073517
+        ],
+        [
+          3151,
+          0.15914627205664425
+        ],
+        [
+          4343,
+          0.44810239389749523
+        ],
+        [
+          4345,
+          0.29202874650023053
+        ],
+        [
+          4626,
+          0.20020149945503918
+        ],
+        [
+          4728,
+          0.14856464053171137
+        ],
+        [
+          4774,
+          0.16428864576698793
+        ],
+        [
+          4778,
+          0.30529827682828525
+        ],
+        [
+          4961,
+          0.1673136012749336
+        ]
+      ]
+    },
+    {
+      "id": 3,
+      "label": 1,
+      "sender": "Elwood Blankenship <RobtriptychAvila@jonathanpollard.org>",
+      "subject": "Click here to purchase high quality replica watch",
+      "body": "Solid 14k or 18k Gold on two toned models save 90 on watches! visit replica store Most reliable replica from Patek Philippe watch here http://fundspampasau.com/",
+      "normalized": {
+        "subject": "click here to purchase high quality replica watch",
+        "body": "solid 14k or 18k gold on two toned models save 90 on watches visit replica store most reliable replica from patek philippe watch here"
+      },
+      "engineered_features": {
+        "body_word_count": 25.0,
+        "body_exclamation_count": 1.0,
+        "email_local_length": 16.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 4.0,
+        "body_url_count": 1.0,
+        "body_entropy": 4.447924700611826,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.189898095464287,
+        "domain_length": 19.0,
+        "subject_entropy": 3.8331759119367605,
+        "body_avg_word_length": 5.44,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.5
+      },
+      "subject_tfidf_nonzero": [
+        [
+          339,
+          0.48878586604887053
+        ],
+        [
+          810,
+          0.41572124204000654
+        ],
+        [
+          1386,
+          0.44889042501564086
+        ],
+        [
+          1395,
+          0.38316408545455893
+        ],
+        [
+          1476,
+          0.3067698097375574
+        ],
+        [
+          1935,
+          0.3818889627211048
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          262,
+          0.24318599195951066
+        ],
+        [
+          1979,
+          0.2801316374627005
+        ],
+        [
+          2907,
+          0.2653586166682427
+        ],
+        [
+          3235,
+          0.3063518523742927
+        ],
+        [
+          3236,
+          0.3180452801622615
+        ],
+        [
+          3302,
+          0.3100484560991901
+        ],
+        [
+          3741,
+          0.2374907022572766
+        ],
+        [
+          3761,
+          0.38030714563182405
+        ],
+        [
+          3933,
+          0.18857310001279953
+        ],
+        [
+          4146,
+          0.29705768604157257
+        ],
+        [
+          4276,
+          0.225795767851572
+        ],
+        [
+          4817,
+          0.1886485845357733
+        ],
+        [
+          4857,
+          0.20196132005085662
+        ],
+        [
+          4858,
+          0.2205413955816489
+        ]
+      ]
+    },
+    {
+      "id": 4,
+      "label": 0,
+      "sender": "<qydlqcws-iacfym@issues.apache.org>",
+      "subject": "New vbounce mis identifies mail generated from trac as a bounce",
+      "body": "http://issues.apache.org/SpamAssassin/show_bug.cgi?id=5688 Summary vbounce mis identifies mail generated from trac as a bounce Product Spamassassin Version 3 2 1 Platform Other OS Version other Status NEW Severity normal Priority P5 Component Rules AssignedTo xrh spamassassin.apache.org ReportedBy ngotzh ajlc.waterloo.on ca Tony Lill writes Justin Mason wrote Tony Lill writes Sometime after Wed 03 Oct 2007 15 27 02 0000 spamassassin started flagging the messages coming out of the mythtv svn system as bounce messages near as I can tell because svn was upgraded from X Trac Version 0 11dev r4937 X Mailer Trac 0 11dev r4937 by Edgewall Software to X Trac Version 0 11dev r6048 X Mailer Trac 0 11dev r6048 by Edgewall Software and started adding an Auto Submitted auto generated header line I m sure I m not the only person who s being bitten by this It s the latter header that s causing the problem you have the anti bounce ruleset activated and that header is used by that ruleset as an indication of a bounce j I m glad you agree that the vbounce ruleset is broken According to the draft It goes both ways Trac should not be using that header either since arguably the update mail contains manually generated text ie code that a user has checked in But anyway please open a bug at our bugzilla j 2 Semantics This field indicates whether the message was sent with or without explicit human control The auto generated keyword SHOULD be used on messages generated by automatic often periodic processes MUST NOT be used on manually generated messages MUST NOT be used on a message issued in direct response to another message The auto replied keyword SHOULD be used on messages sent in direct response to another message MUST NOT be used on manually generated messages MUST NOT be used on messages generated by automatic or periodic processes So only Auto Submitted auto replied should be considered a bounce message",
+      "normalized": {
+        "subject": "new vbounce mis identifies mail generated from trac as a bounce",
+        "body": "summary vbounce mis identifies mail generated from trac as a bounce product spamassassin version 3 2 1 platform other os version other status new severity normal priority p5 component rules assignedto xrh spamassassin.apache.org reportedby ngotzh ajlc.waterloo.on ca tony lill writes justin mason wrote tony lill writes sometime after wed 03 oct 2007 15 27 02 0000 spamassassin started flagging the messages coming out of the mythtv svn system as bounce messages near as i can tell because svn was upgraded from x trac version 0 11dev r4937 x mailer trac 0 11dev r4937 by edgewall software to x trac version 0 11dev r6048 x mailer trac 0 11dev r6048 by edgewall software and started adding an auto submitted auto generated header line i m sure i m not the only person who s being bitten by this it s the latter header that s causing the problem you have the anti bounce ruleset activated and that header is used by that ruleset as an indication of a bounce j i m glad you agree that the vbounce ruleset is broken according to the draft it goes both ways trac should not be using that header either since arguably the update mail contains manually generated text ie code that a user has checked in but anyway please open a bug at our bugzilla j 2 semantics this field indicates whether the message was sent with or without explicit human control the auto generated keyword should be used on messages generated by automatic often periodic processes must not be used on manually generated messages must not be used on a message issued in direct response to another message the auto replied keyword should be used on messages sent in direct response to another message must not be used on manually generated messages must not be used on messages generated by automatic or periodic processes so only auto submitted auto replied should be considered a bounce message"
+      },
+      "engineered_features": {
+        "body_word_count": 325.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 15.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.3076923076923077,
+        "body_url_count": 1.0,
+        "body_entropy": 4.367448957005458,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.0269868333592873,
+        "domain_length": 17.0,
+        "subject_entropy": 3.9287082576520436,
+        "body_avg_word_length": 4.907692307692308,
+        "sender_name_exists": 0.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.875
+      },
+      "subject_tfidf_nonzero": [
+        [
+          732,
+          0.7578482509283961
+        ],
+        [
+          1028,
+          0.5167558998173749
+        ],
+        [
+          1142,
+          0.39828302570999163
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          12,
+          0.07286967405047831
+        ],
+        [
+          16,
+          0.07015477911435199
+        ],
+        [
+          19,
+          0.07430570095368934
+        ],
+        [
+          80,
+          0.05977278057306141
+        ],
+        [
+          109,
+          0.04890542856548794
+        ],
+        [
+          135,
+          0.07364560620850304
+        ],
+        [
+          318,
+          0.07720260481589324
+        ],
+        [
+          346,
+          0.08637715345467349
+        ],
+        [
+          397,
+          0.08128921478836962
+        ],
+        [
+          461,
+          0.09513491675294064
+        ],
+        [
+          468,
+          0.10128849742151502
+        ],
+        [
+          580,
+          0.2562072387398459
+        ],
+        [
+          586,
+          0.16734541506848105
+        ],
+        [
+          753,
+          0.08707640132485739
+        ],
+        [
+          762,
+          0.07797559200562805
+        ],
+        [
+          792,
+          0.06081659893957169
+        ],
+        [
+          917,
+          0.08780888702076799
+        ],
+        [
+          989,
+          0.0483961748158288
+        ],
+        [
+          1016,
+          0.08181172562575491
+        ],
+        [
+          1064,
+          0.10195689889814362
+        ],
+        [
+          1102,
+          0.08261810672270371
+        ],
+        [
+          1124,
+          0.07756669876040087
+        ],
+        [
+          1140,
+          0.07661426645492163
+        ],
+        [
+          1394,
+          0.12630802807103333
+        ],
+        [
+          1480,
+          0.1039601690029972
+        ],
+        [
+          1704,
+          0.10161907510373298
+        ],
+        [
+          1797,
+          0.08308781312553905
+        ],
+        [
+          1932,
+          0.2700362331381812
+        ],
+        [
+          1959,
+          0.07095619193275526
+        ],
+        [
+          1977,
+          0.08323916550616958
+        ],
+        [
+          2090,
+          0.20725074744355437
+        ],
+        [
+          2194,
+          0.0859783974493731
+        ],
+        [
+          2372,
+          0.09926112453589918
+        ],
+        [
+          2444,
+          0.1815971721166673
+        ],
+        [
+          2575,
+          0.05644567601221789
+        ],
+        [
+          2718,
+          0.08654838375585823
+        ],
+        [
+          2766,
+          0.20771437658284767
+        ],
+        [
+          2841,
+          0.1335636250937832
+        ],
+        [
+          2845,
+          0.09918960425178212
+        ],
+        [
+          2846,
+          0.21118445659199409
+        ],
+        [
+          2992,
+          0.07986090422131129
+        ],
+        [
+          3015,
+          0.040771654936715626
+        ],
+        [
+          3045,
+          0.08346901788896163
+        ],
+        [
+          3083,
+          0.10080555680758671
+        ],
+        [
+          3125,
+          0.06439775592769506
+        ],
+        [
+          3151,
+          0.05358261334425486
+        ],
+        [
+          3159,
+          0.0809796257424325
+        ],
+        [
+          3283,
+          0.06871146010633383
+        ],
+        [
+          3364,
+          0.08784302345459084
+        ],
+        [
+          3493,
+          0.09897701338376998
+        ],
+        [
+          3506,
+          0.055746517989852196
+        ],
+        [
+          3515,
+          0.16734541506848105
+        ],
+        [
+          3519,
+          0.06515515236053356
+        ],
+        [
+          3766,
+          0.16470836751268286
+        ],
+        [
+          3811,
+          0.12572648223657648
+        ],
+        [
+          3884,
+          0.08534074852975851
+        ],
+        [
+          4007,
+          0.10033394445408793
+        ],
+        [
+          4137,
+          0.10719277593073355
+        ],
+        [
+          4185,
+          0.17471334612753908
+        ],
+        [
+          4240,
+          0.12746023663040104
+        ],
+        [
+          4258,
+          0.0722050987864972
+        ],
+        [
+          4328,
+          0.16039004210971353
+        ],
+        [
+          4358,
+          0.08748830701478337
+        ],
+        [
+          4381,
+          0.060482929305822865
+        ],
+        [
+          4402,
+          0.1550876804411228
+        ],
+        [
+          4464,
+          0.06700680438809281
+        ],
+        [
+          4487,
+          0.06882048855409456
+        ],
+        [
+          4561,
+          0.15625775274085693
+        ],
+        [
+          4692,
+          0.0659393193218441
+        ],
+        [
+          4693,
+          0.08944413623956912
+        ],
+        [
+          4718,
+          0.16788726193754075
+        ],
+        [
+          4722,
+          0.0663617231708609
+        ],
+        [
+          4728,
+          0.05001990676480039
+        ],
+        [
+          4785,
+          0.1340790903209453
+        ],
+        [
+          4863,
+          0.10527915574522055
+        ],
+        [
+          4866,
+          0.08243656641925923
+        ],
+        [
+          4881,
+          0.08755524563713855
+        ],
+        [
+          4957,
+          0.13980229329043212
+        ],
+        [
+          4961,
+          0.0563324537137677
+        ]
+      ]
+    },
+    {
+      "id": 5,
+      "label": 1,
+      "sender": "Don <ghgrqxh@carilion.com>",
+      "subject": "of them despite you know nothing but I Mallow sat down with gentle attitude the Galaxy was on",
+      "body": "Mallow impatiently in Gaal entered the beginning of the vast storehouses structure and the land of which has been in Hardin s voice grew Terminus City in reasonably calm underwear his hair s gray of them despite you know nothing but I Mallow sat down with gentle attitude the Galaxy was on the other hand and that the first appearance of Terminus he wondered at Fall of the main force Drawt made without ever don t go on our homes on I am best he did I thought that Sutt how and another mathematician two days Why? Hardin Jump it may be the least of nucleah powah though in the time Vault? How do? Yohan Lee We ve lost in the cell was Hardin noticed that is He had gone here with suspicion I his departing nephew expressionlessly and emphasized his head high spirits are you into politics thought that had grown old to drag know of light that included the edges of course of the three centuries of Trustees and then Commdor prevents the greatest contributions were armed men from now they had waited And waited for there were I resent Please said Sutt would you see me He was an autonomous rights Q beam without one for mine to the data on this Terminus is our course said you have perhaps even the leader the Chairman of it? Is our real and he is it is safe for any previous interval we were perhaps a little note in any secret I suppose your terms to be valid There to find has stood when he died! Perhaps to use of to be offered but my underlings in defiance of lore meaningless ritual of itself was really going to be no hearing with brute a game of the percentage is my living a planet where would that will felt in horror of Anacreon on Terminus but of HARI SELDON had only after the interview is of our thorough and I wonder have me five minutes after the Entuns Said Mallow lit up at noon last millennium of the These to individual in nature and his name of the Nuclear power altogether and the latter s rapid than a Smyrnian Q Too used to this an over and the one anyway and improving upon such folly the immediate release of the line of what does Siwenna and that s what do you Scahcely civilized in tone while Mallow s the Foundation s planets and only proper that of the Askonian ruler and expensive swathe through and the nerve to conclusions co death when I offer the face seemed formidable to get the capacity and became that prosperity I succeeded shot and following ultimatum To escort? Space! Hardin smiled frostily and it was inevitable barbarism that? The ship a subject up that s Where Where do you call the raised his words Mallow gestured a cigar away What I want it away into landed on Terminus may His voice you wherever you comes to move must be fired Hardin said anything concrete",
+      "normalized": {
+        "subject": "of them despite you know nothing but i mallow sat down with gentle attitude the galaxy was on",
+        "body": "mallow impatiently in gaal entered the beginning of the vast storehouses structure and the land of which has been in hardin s voice grew terminus city in reasonably calm underwear his hair s gray of them despite you know nothing but i mallow sat down with gentle attitude the galaxy was on the other hand and that the first appearance of terminus he wondered at fall of the main force drawt made without ever don t go on our homes on i am best he did i thought that sutt how and another mathematician two days why hardin jump it may be the least of nucleah powah though in the time vault how do yohan lee we ve lost in the cell was hardin noticed that is he had gone here with suspicion i his departing nephew expressionlessly and emphasized his head high spirits are you into politics thought that had grown old to drag know of light that included the edges of course of the three centuries of trustees and then commdor prevents the greatest contributions were armed men from now they had waited and waited for there were i resent please said sutt would you see me he was an autonomous rights q beam without one for mine to the data on this terminus is our course said you have perhaps even the leader the chairman of it is our real and he is it is safe for any previous interval we were perhaps a little note in any secret i suppose your terms to be valid there to find has stood when he died perhaps to use of to be offered but my underlings in defiance of lore meaningless ritual of itself was really going to be no hearing with brute a game of the percentage is my living a planet where would that will felt in horror of anacreon on terminus but of hari seldon had only after the interview is of our thorough and i wonder have me five minutes after the entuns said mallow lit up at noon last millennium of the these to individual in nature and his name of the nuclear power altogether and the latter s rapid than a smyrnian q too used to this an over and the one anyway and improving upon such folly the immediate release of the line of what does siwenna and that s what do you scahcely civilized in tone while mallow s the foundation s planets and only proper that of the askonian ruler and expensive swathe through and the nerve to conclusions co death when i offer the face seemed formidable to get the capacity and became that prosperity i succeeded shot and following ultimatum to escort space hardin smiled frostily and it was inevitable barbarism that the ship a subject up that s where where do you call the raised his words mallow gestured a cigar away what i want it away into landed on terminus may his voice you wherever you comes to move must be fired hardin said anything concrete"
+      },
+      "engineered_features": {
+        "body_word_count": 510.0,
+        "body_exclamation_count": 2.0,
+        "email_local_length": 7.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 4.156647255420811,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.75,
+        "domain_length": 12.0,
+        "subject_entropy": 4.002992017654137,
+        "body_avg_word_length": 4.309803921568627,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.8333333333333334
+      },
+      "subject_tfidf_nonzero": [
+        [
+          925,
+          0.6197491387047366
+        ],
+        [
+          1539,
+          0.7847999777489404
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          476,
+          0.12358974838262346
+        ],
+        [
+          603,
+          0.14891791985073746
+        ],
+        [
+          645,
+          0.11047883054233626
+        ],
+        [
+          660,
+          0.06271068494744539
+        ],
+        [
+          824,
+          0.12929959487397555
+        ],
+        [
+          864,
+          0.11092338698246791
+        ],
+        [
+          882,
+          0.1287253591552748
+        ],
+        [
+          942,
+          0.10144959178866002
+        ],
+        [
+          1013,
+          0.09220379225118956
+        ],
+        [
+          1174,
+          0.14678947246017715
+        ],
+        [
+          1246,
+          0.07302468423514112
+        ],
+        [
+          1263,
+          0.0828736839030591
+        ],
+        [
+          1281,
+          0.09585126810539066
+        ],
+        [
+          1351,
+          0.12237172922513151
+        ],
+        [
+          1377,
+          0.0739715071441793
+        ],
+        [
+          1381,
+          0.09861368169702324
+        ],
+        [
+          1440,
+          0.06463448722908612
+        ],
+        [
+          1456,
+          0.057077040296024686
+        ],
+        [
+          1605,
+          0.1287253591552748
+        ],
+        [
+          1696,
+          0.10781492815704419
+        ],
+        [
+          1724,
+          0.10056209655432624
+        ],
+        [
+          1743,
+          0.10938951225489087
+        ],
+        [
+          1795,
+          0.11586857967285207
+        ],
+        [
+          1842,
+          0.07361382606873892
+        ],
+        [
+          1848,
+          0.11043493314940825
+        ],
+        [
+          1874,
+          0.11613186816051643
+        ],
+        [
+          1916,
+          0.1130111404024894
+        ],
+        [
+          1978,
+          0.07702240311781194
+        ],
+        [
+          1981,
+          0.10144959178866002
+        ],
+        [
+          2015,
+          0.1297119778141477
+        ],
+        [
+          2019,
+          0.12118774453313394
+        ],
+        [
+          2056,
+          0.1264844408383784
+        ],
+        [
+          2061,
+          0.09173238914470898
+        ],
+        [
+          2086,
+          0.07954271536219593
+        ],
+        [
+          2099,
+          0.10728632260112908
+        ],
+        [
+          2132,
+          0.07079369818253296
+        ],
+        [
+          2232,
+          0.10329665951889928
+        ],
+        [
+          2254,
+          0.10664530364127231
+        ],
+        [
+          2273,
+          0.1076814127738799
+        ],
+        [
+          2336,
+          0.12574326534710933
+        ],
+        [
+          2470,
+          0.10088213842319078
+        ],
+        [
+          2489,
+          0.1129610939519394
+        ],
+        [
+          2525,
+          0.12084626843523866
+        ],
+        [
+          2534,
+          0.13287548060235466
+        ],
+        [
+          2567,
+          0.1048573276458699
+        ],
+        [
+          2575,
+          0.07065654100021525
+        ],
+        [
+          2609,
+          0.08393753264629532
+        ],
+        [
+          2614,
+          0.10758660719800035
+        ],
+        [
+          2670,
+          0.10363272796032268
+        ],
+        [
+          2729,
+          0.0921697359389596
+        ],
+        [
+          2833,
+          0.08090728939993136
+        ],
+        [
+          2883,
+          0.09424218360977016
+        ],
+        [
+          2990,
+          0.10953543436714872
+        ],
+        [
+          3048,
+          0.08306907003916365
+        ],
+        [
+          3052,
+          0.1112865580989318
+        ],
+        [
+          3089,
+          0.07307836775120337
+        ],
+        [
+          3090,
+          0.10053582984384479
+        ],
+        [
+          3115,
+          0.08038766283259503
+        ],
+        [
+          3270,
+          0.11901771851138354
+        ],
+        [
+          3359,
+          0.11851131421898686
+        ],
+        [
+          3400,
+          0.11558019020942337
+        ],
+        [
+          3425,
+          0.08801495016371552
+        ],
+        [
+          3468,
+          0.09170745755062754
+        ],
+        [
+          3552,
+          0.11313682746504782
+        ],
+        [
+          3636,
+          0.11449493955273453
+        ],
+        [
+          3667,
+          0.07583749475063341
+        ],
+        [
+          3672,
+          0.07042365941802656
+        ],
+        [
+          3736,
+          0.08886320318762676
+        ],
+        [
+          3848,
+          0.10974582790114372
+        ],
+        [
+          3890,
+          0.08541389693698985
+        ],
+        [
+          3898,
+          0.17396584497738624
+        ],
+        [
+          3925,
+          0.10632374793324025
+        ],
+        [
+          3977,
+          0.10525547548240942
+        ],
+        [
+          4053,
+          0.11359620383085724
+        ],
+        [
+          4060,
+          0.12402824216393595
+        ],
+        [
+          4181,
+          0.09671448762294926
+        ],
+        [
+          4271,
+          0.12216928354942634
+        ],
+        [
+          4309,
+          0.11229787372856422
+        ],
+        [
+          4323,
+          0.07844708794476232
+        ],
+        [
+          4378,
+          0.11158675284041233
+        ],
+        [
+          4475,
+          0.09870895545048435
+        ],
+        [
+          4516,
+          0.14860687033748912
+        ],
+        [
+          4539,
+          0.05076293640720323
+        ],
+        [
+          4715,
+          0.054095341693641344
+        ],
+        [
+          4718,
+          0.07133783806896295
+        ],
+        [
+          4758,
+          0.10871607999091679
+        ],
+        [
+          4774,
+          0.0692399371787003
+        ],
+        [
+          4829,
+          0.17132937517704325
+        ],
+        [
+          4842,
+          0.059966614345493614
+        ],
+        [
+          4936,
+          0.10859612377523506
+        ],
+        [
+          4941,
+          0.100069043464648
+        ]
+      ]
+    },
+    {
+      "id": 6,
+      "label": 0,
+      "sender": "harley argote ch Robert Harley",
+      "subject": "Al Qaeda s fantasy ideology Policy Review no 114",
+      "body": "There is a hot dispute about the original size of the indigenous population but the evidence for a high density in the Mexican area is sound It was up here in the North or in the Amazon where I m a little more suspicious of very high upward revisions Right there was definitely a relatively high density in Mexico and much less elsewhere Population estimates vary wildly and about all your average skeptic can do is take geometric means to get ballpark figures While Central America may have had 20 or 30 million vast areas of South America were uninhabited and other places very sparsely e g the plains Indians in what is now the U S may have been 2 million or so There are those who claim that the Mexican population declined from 20 something million to circa 8 or 10 million in the 16th century certainly in part due to infectious diseases new and old and other factors and was probably in decline before contact Others claim it declined from 80 ish million to 3 or 4 million and somehow deduce 95 mortality from imported diseases and have a pretty clear agenda which makes me for one take their claims with a large grain of salt About all that is certain is that anyone alive in 1500 was dead in 1600 in the Americas or elsewhere R http://xent.com/mailman/listinfo/fork",
+      "normalized": {
+        "subject": "al qaeda s fantasy ideology policy review no 114",
+        "body": "there is a hot dispute about the original size of the indigenous population but the evidence for a high density in the mexican area is sound it was up here in the north or in the amazon where i m a little more suspicious of very high upward revisions right there was definitely a relatively high density in mexico and much less elsewhere population estimates vary wildly and about all your average skeptic can do is take geometric means to get ballpark figures while central america may have had 20 or 30 million vast areas of south america were uninhabited and other places very sparsely e g the plains indians in what is now the u s may have been 2 million or so there are those who claim that the mexican population declined from 20 something million to circa 8 or 10 million in the 16th century certainly in part due to infectious diseases new and old and other factors and was probably in decline before contact others claim it declined from 80 ish million to 3 or 4 million and somehow deduce 95 mortality from imported diseases and have a pretty clear agenda which makes me for one take their claims with a large grain of salt about all that is certain is that anyone alive in 1500 was dead in 1600 in the americas or elsewhere r"
+      },
+      "engineered_features": {
+        "body_word_count": 231.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 0.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.4329004329004329,
+        "body_url_count": 1.0,
+        "body_entropy": 4.3119137144415065,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 0.0,
+        "domain_length": 0.0,
+        "subject_entropy": 4.07507052036418,
+        "body_avg_word_length": 4.51948051948052,
+        "sender_name_exists": 0.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.0
+      },
+      "subject_tfidf_nonzero": [
+        [
+          125,
+          0.6161444812225608
+        ],
+        [
+          1313,
+          0.5893222662868965
+        ],
+        [
+          1498,
+          0.5225564512255662
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          43,
+          0.08118662333299291
+        ],
+        [
+          97,
+          0.17707713522926782
+        ],
+        [
+          143,
+          0.10537967434059388
+        ],
+        [
+          248,
+          0.14025358573456906
+        ],
+        [
+          270,
+          0.13068727756119197
+        ],
+        [
+          424,
+          0.17577519432172292
+        ],
+        [
+          435,
+          0.1972684338082008
+        ],
+        [
+          436,
+          0.2416978855689106
+        ],
+        [
+          503,
+          0.14393875507766157
+        ],
+        [
+          504,
+          0.15078635280555916
+        ],
+        [
+          598,
+          0.15091691356796635
+        ],
+        [
+          868,
+          0.1654538596228689
+        ],
+        [
+          874,
+          0.13042764719019734
+        ],
+        [
+          876,
+          0.14787444749873166
+        ],
+        [
+          945,
+          0.23376375047494669
+        ],
+        [
+          947,
+          0.15837023158717436
+        ],
+        [
+          956,
+          0.13488389670185047
+        ],
+        [
+          1114,
+          0.0990338568820085
+        ],
+        [
+          1266,
+          0.15440342450937047
+        ],
+        [
+          1308,
+          0.1492913709175511
+        ],
+        [
+          1423,
+          0.14887546371526988
+        ],
+        [
+          1658,
+          0.17570986690108903
+        ],
+        [
+          1727,
+          0.18317279178385992
+        ],
+        [
+          2132,
+          0.20902379131659482
+        ],
+        [
+          2176,
+          0.14163098957481196
+        ],
+        [
+          2500,
+          0.123772018541757
+        ],
+        [
+          2609,
+          0.11809325906338179
+        ],
+        [
+          2742,
+          0.12041602763135872
+        ],
+        [
+          2812,
+          0.1182971109124638
+        ],
+        [
+          2866,
+          0.33087478017056104
+        ],
+        [
+          3015,
+          0.07180405042445538
+        ],
+        [
+          3047,
+          0.15830142665762956
+        ],
+        [
+          3115,
+          0.11309888190772818
+        ],
+        [
+          3158,
+          0.12232827230697729
+        ],
+        [
+          3351,
+          0.15938801387580273
+        ],
+        [
+          3466,
+          0.13608454339288495
+        ],
+        [
+          3505,
+          0.12288167639263045
+        ],
+        [
+          3846,
+          0.09436577142666516
+        ],
+        [
+          4096,
+          0.11998550389946458
+        ],
+        [
+          4162,
+          0.1510218162305995
+        ],
+        [
+          4175,
+          0.1376440492183498
+        ]
+      ]
+    },
+    {
+      "id": 7,
+      "label": 1,
+      "sender": "Orest",
+      "subject": "Barely 16 and for your pleasure",
+      "body": "Does your manhood feels heavy we can make it really massive http://www.fiftywin.com/",
+      "normalized": {
+        "subject": "barely 16 and for your pleasure",
+        "body": "does your manhood feels heavy we can make it really massive"
+      },
+      "engineered_features": {
+        "body_word_count": 12.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 0.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 16.666666666666664,
+        "body_url_count": 2.0,
+        "body_entropy": 4.319913689509908,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 0.0,
+        "domain_length": 0.0,
+        "subject_entropy": 3.7192945256669785,
+        "body_avg_word_length": 6.083333333333333,
+        "sender_name_exists": 0.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.0
+      },
+      "subject_tfidf_nonzero": [
+        [
+          30,
+          0.568832365718049
+        ],
+        [
+          201,
+          0.6423271184152082
+        ],
+        [
+          1301,
+          0.513659043198913
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          1440,
+          0.26958186352042246
+        ],
+        [
+          1790,
+          0.5329815654350502
+        ],
+        [
+          2105,
+          0.5128087338564075
+        ],
+        [
+          2737,
+          0.2511894780841013
+        ],
+        [
+          2762,
+          0.4805323483496134
+        ],
+        [
+          3672,
+          0.2937277319854059
+        ]
+      ]
+    },
+    {
+      "id": 8,
+      "label": 1,
+      "sender": "Maurice Escamilla <mrhealth@btamail.net.cn>",
+      "subject": "The database that Bill Gates doesnt want you to know about!!!!!",
+      "body": "IMPORTANT NOTICE Regarding your domain name If you own a com net org you are advised to register your ws web site domain before someone else takes it forever Major corporations such as Yahoo ATT Intel have all registered their ws web site domains for their company names as well as all their trademarks to protect them forever ws web site domains are in 180 countries worldwide Availability for ws is 88 compared to 24 for com We thought you d find the article on ws below interesting If you want more information on where to register ws web site domains and how to get a discount on multiple registrations contact us at http://www.netleads.ws/morgan Also if you would like to increase traffic to your web site by submitting your URL to 500 search engines and directories at once then call us today Sincerely Joe Stacy Morgan 1 888 660 0625 Internet Names LLC NEWS RELEASE WS WebSite Domains Strikes Landmark Deal GDI receives 2 250 860 for the rights to 311 premium ws domain names Last week GDI Global Domains International Inc the registry for.ws web site domains closed a deal with a large publicly traded company one of the biggest players in the com arena and received payment in full of 2 250 860 for the rights to a select group of premium ws domain names The 311 domain names will be resold to the highest bidders and ultimately developed into substantial ws web sites giving ws even more publicity down the road To be be removed http://www.netleads.ws/remove",
+      "normalized": {
+        "subject": "the database that bill gates doesnt want you to know about",
+        "body": "important notice regarding your domain name if you own a com net org you are advised to register your ws web site domain before someone else takes it forever major corporations such as yahoo att intel have all registered their ws web site domains for their company names as well as all their trademarks to protect them forever ws web site domains are in 180 countries worldwide availability for ws is 88 compared to 24 for com we thought you d find the article on ws below interesting if you want more information on where to register ws web site domains and how to get a discount on multiple registrations contact us at also if you would like to increase traffic to your web site by submitting your url to 500 search engines and directories at once then call us today sincerely joe stacy morgan 1 888 660 0625 internet names llc news release ws website domains strikes landmark deal gdi receives 2 250 860 for the rights to 311 premium ws domain names last week gdi global domains international inc the registry for.ws web site domains closed a deal with a large publicly traded company one of the biggest players in the com arena and received payment in full of 2 250 860 for the rights to a select group of premium ws domain names the 311 domain names will be resold to the highest bidders and ultimately developed into substantial ws web sites giving ws even more publicity down the road to be be removed"
+      },
+      "engineered_features": {
+        "body_word_count": 259.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 8.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 1.5444015444015444,
+        "body_url_count": 4.0,
+        "body_entropy": 4.369770802415987,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.0957952550009344,
+        "domain_length": 14.0,
+        "subject_entropy": 3.771981720171726,
+        "body_avg_word_length": 4.671814671814672,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 5.0,
+        "domain_vowel_consonant_ratio": 0.5
+      },
+      "subject_tfidf_nonzero": [
+        [
+          441,
+          0.6541314337098774
+        ],
+        [
+          925,
+          0.5570641470685361
+        ],
+        [
+          1926,
+          0.5116557470443036
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          89,
+          0.11210227858021145
+        ],
+        [
+          127,
+          0.074820025516645
+        ],
+        [
+          130,
+          0.1928088431790523
+        ],
+        [
+          192,
+          0.08565175375726093
+        ],
+        [
+          257,
+          0.11144081221677588
+        ],
+        [
+          377,
+          0.11301075481720078
+        ],
+        [
+          521,
+          0.1056096355951048
+        ],
+        [
+          588,
+          0.09747411933012744
+        ],
+        [
+          670,
+          0.10923526305042626
+        ],
+        [
+          969,
+          0.08905739238320994
+        ],
+        [
+          1002,
+          0.10101904245618673
+        ],
+        [
+          1046,
+          0.10049673943922549
+        ],
+        [
+          1051,
+          0.1116859042495255
+        ],
+        [
+          1114,
+          0.06304176919047347
+        ],
+        [
+          1169,
+          0.0974560548239362
+        ],
+        [
+          1268,
+          0.11857184291653028
+        ],
+        [
+          1362,
+          0.10659215184720414
+        ],
+        [
+          1398,
+          0.11164481338926076
+        ],
+        [
+          1407,
+          0.0917820988063106
+        ],
+        [
+          1454,
+          0.24594394655265703
+        ],
+        [
+          1455,
+          0.29499857275024227
+        ],
+        [
+          1858,
+          0.18861710288171157
+        ],
+        [
+          1957,
+          0.0898062910216532
+        ],
+        [
+          1964,
+          0.09603556265108187
+        ],
+        [
+          2027,
+          0.07467933057688463
+        ],
+        [
+          2139,
+          0.10348788782265352
+        ],
+        [
+          2243,
+          0.0782165937803102
+        ],
+        [
+          2261,
+          0.08049506578851866
+        ],
+        [
+          2284,
+          0.05667242957790221
+        ],
+        [
+          2317,
+          0.11323428573024677
+        ],
+        [
+          2327,
+          0.09379287616302842
+        ],
+        [
+          2331,
+          0.08617006102876944
+        ],
+        [
+          2332,
+          0.0753844801904267
+        ],
+        [
+          2400,
+          0.10888190311594635
+        ],
+        [
+          2500,
+          0.07878928753067664
+        ],
+        [
+          2568,
+          0.04691484828391783
+        ],
+        [
+          2619,
+          0.10139312441265155
+        ],
+        [
+          2736,
+          0.08416731677996485
+        ],
+        [
+          2963,
+          0.08870565100321927
+        ],
+        [
+          2978,
+          0.20377758195579607
+        ],
+        [
+          3006,
+          0.0707812323546001
+        ],
+        [
+          3025,
+          0.05860900625049895
+        ],
+        [
+          3051,
+          0.0857798802873543
+        ],
+        [
+          3151,
+          0.060070216076190765
+        ],
+        [
+          3248,
+          0.08500741897637375
+        ],
+        [
+          3368,
+          0.11523570875877229
+        ],
+        [
+          3445,
+          0.15006304681110266
+        ],
+        [
+          3561,
+          0.09776574985798187
+        ],
+        [
+          3683,
+          0.07431595772382174
+        ],
+        [
+          3709,
+          0.0870766292462502
+        ],
+        [
+          3716,
+          0.16920802656719208
+        ],
+        [
+          3717,
+          0.09149841230770359
+        ],
+        [
+          3720,
+          0.12071923923419685
+        ],
+        [
+          3736,
+          0.07958579752894943
+        ],
+        [
+          3753,
+          0.08796030507100867
+        ],
+        [
+          3848,
+          0.16641648305415999
+        ],
+        [
+          3859,
+          0.08449676662610248
+        ],
+        [
+          3970,
+          0.08031336017545418
+        ],
+        [
+          3991,
+          0.09847876149304949
+        ],
+        [
+          4084,
+          0.08220765046853777
+        ],
+        [
+          4089,
+          0.18078800543677695
+        ],
+        [
+          4092,
+          0.09804369738379919
+        ],
+        [
+          4424,
+          0.08260818055029627
+        ],
+        [
+          4516,
+          0.07860637793344168
+        ],
+        [
+          4553,
+          0.0636510935570642
+        ],
+        [
+          4587,
+          0.11378286191930538
+        ],
+        [
+          4590,
+          0.11148142022277133
+        ],
+        [
+          4706,
+          0.08539831623265191
+        ],
+        [
+          4842,
+          0.05370604093260467
+        ],
+        [
+          4871,
+          0.19089887109870882
+        ],
+        [
+          4875,
+          0.24246535655375084
+        ],
+        [
+          4878,
+          0.07881382242808702
+        ],
+        [
+          4883,
+          0.07158632306189293
+        ],
+        [
+          4950,
+          0.08643516407060046
+        ],
+        [
+          4979,
+          0.08603901934955553
+        ]
+      ]
+    },
+    {
+      "id": 9,
+      "label": 0,
+      "sender": "Greg Snow <Greg.Snow@intermountainmail.org>",
+      "subject": "how to iterate",
+      "body": "Here is one approach tmp my.df names my.df my.df Category fit1 summary fit1 Df Sum Sq Mean Sq F value Pr F Category 2 13005 6503 2 7324 0 09355 Residuals 17 40456 2380 Signif codes 0 0 001 0 01 0 05 0 1 1 out1 now look at a histogram of the p values tmp F 1 1 hist tmp Hope this helps Gregory Greg L Snow Ph D Statistical Data Center Intermountain Healthcare greg.snow intermountainmail.org 801 408 8111 From r help bounces stat.math.ethz ch mailto:r-help-bounces@stat.math.ethz.ch] On Behalf Of Tavpritesh Sethi Sent Tuesday June 26 2007 8 08 AM To r help stat.math.ethz ch Subject R how to iterate for the following example dataset Category Variable 1 127 1 261 1 142 1 183 1 234 1 162 2 173 2 321 2 168 2 197 2 213 2 261 3 198 3 126 3 167 3 154 3 134 3 187 3 109 3 210 I have performed Anova on the measured variable column 2 for the groups 1 2 3 column 1 Now I want to randomize the values in C 2 and reperform the test say a hundred times Please suggest a way for this iteration The loop I tried to write didn t work Thanks alternative HTML version deleted R help stat.math.ethz ch mailing list https://stat.ethz.ch/mailman/listinfo/r-help PLEASE do read the posting guide http://www.R-project.org/posting-guide.html and provide commented minimal self contained reproducible code R help stat.math.ethz ch mailing list https://stat.ethz.ch/mailman/listinfo/r-help PLEASE do read the posting guide http://www.R-project.org/posting-guide.html and provide commented minimal self contained reproducible code",
+      "normalized": {
+        "subject": "how to iterate",
+        "body": "here is one approach tmp my.df names my.df my.df category fit1 summary fit1 df sum sq mean sq f value pr f category 2 13005 6503 2 7324 0 09355 residuals 17 40456 2380 signif codes 0 0 001 0 01 0 05 0 1 1 out1 now look at a histogram of the p values tmp f 1 1 hist tmp hope this helps gregory greg l snow ph d statistical data center intermountain healthcare greg.snow intermountainmail.org 801 408 8111 from r help bounces stat.math.ethz ch on behalf of tavpritesh sethi sent tuesday june 26 2007 8 08 am to r help stat.math.ethz ch subject r how to iterate for the following example dataset category variable 1 127 1 261 1 142 1 183 1 234 1 162 2 173 2 321 2 168 2 197 2 213 2 261 3 198 3 126 3 167 3 154 3 134 3 187 3 109 3 210 i have performed anova on the measured variable column 2 for the groups 1 2 3 column 1 now i want to randomize the values in c 2 and reperform the test say a hundred times please suggest a way for this iteration the loop i tried to write didn t work thanks alternative html version deleted r help stat.math.ethz ch mailing list please do read the posting guide and provide commented minimal self contained reproducible code r help stat.math.ethz ch mailing list please do read the posting guide and provide commented minimal self contained reproducible code"
+      },
+      "engineered_features": {
+        "body_word_count": 259.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 9.0,
+        "name_email_consistency": 1.0,
+        "body_url_density": 2.7027027027027026,
+        "body_url_count": 7.0,
+        "body_entropy": 4.757443499381989,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.1751231351134614,
+        "domain_length": 21.0,
+        "subject_entropy": 2.8553885422075336,
+        "body_avg_word_length": 4.822393822393822,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.8181818181818182
+      },
+      "subject_tfidf_nonzero": [],
+      "body_tfidf_nonzero": [
+        [
+          14,
+          0.07371374969601888
+        ],
+        [
+          23,
+          0.06800733492004739
+        ],
+        [
+          29,
+          0.07657483041792959
+        ],
+        [
+          70,
+          0.10616280023058804
+        ],
+        [
+          85,
+          0.11395753884039132
+        ],
+        [
+          86,
+          0.06750548795276795
+        ],
+        [
+          109,
+          0.04968147509710774
+        ],
+        [
+          132,
+          0.07471093502023707
+        ],
+        [
+          432,
+          0.07314456550039063
+        ],
+        [
+          433,
+          0.08002037574451841
+        ],
+        [
+          491,
+          0.08479353019220626
+        ],
+        [
+          646,
+          0.08237623382790127
+        ],
+        [
+          715,
+          0.09698248471441244
+        ],
+        [
+          716,
+          0.1012419751980425
+        ],
+        [
+          848,
+          0.20855396237935586
+        ],
+        [
+          866,
+          0.06372493261153356
+        ],
+        [
+          879,
+          0.1397884570559231
+        ],
+        [
+          880,
+          0.10089748657177702
+        ],
+        [
+          989,
+          0.08324212561954811
+        ],
+        [
+          990,
+          0.0860163064501599
+        ],
+        [
+          991,
+          0.10716646972186016
+        ],
+        [
+          1000,
+          0.15563231949605846
+        ],
+        [
+          1025,
+          0.0992463820236378
+        ],
+        [
+          1026,
+          0.0999927135763266
+        ],
+        [
+          1121,
+          0.09717183583430648
+        ],
+        [
+          1122,
+          0.0999927135763266
+        ],
+        [
+          1246,
+          0.05926324210814394
+        ],
+        [
+          1250,
+          0.10488596047577493
+        ],
+        [
+          1317,
+          0.0767302378019065
+        ],
+        [
+          1318,
+          0.08157928727516929
+        ],
+        [
+          1372,
+          0.2517811829559204
+        ],
+        [
+          1379,
+          0.07289808791310709
+        ],
+        [
+          1640,
+          0.14211608367966067
+        ],
+        [
+          1641,
+          0.14211608367966067
+        ],
+        [
+          1664,
+          0.0653515318804423
+        ],
+        [
+          1842,
+          0.059741360644173715
+        ],
+        [
+          2023,
+          0.1627064290229306
+        ],
+        [
+          2029,
+          0.08380592809914457
+        ],
+        [
+          2041,
+          0.0969612108622341
+        ],
+        [
+          2042,
+          0.10002694749287132
+        ],
+        [
+          2095,
+          0.09825709187755018
+        ],
+        [
+          2112,
+          0.10787734158939913
+        ],
+        [
+          2113,
+          0.09995140987000374
+        ],
+        [
+          2115,
+          0.12499955849693116
+        ],
+        [
+          2119,
+          0.07500891175512125
+        ],
+        [
+          2165,
+          0.06671559964973481
+        ],
+        [
+          2166,
+          0.09995140987000374
+        ],
+        [
+          2190,
+          0.06984198013827103
+        ],
+        [
+          2191,
+          0.07950853420359104
+        ],
+        [
+          2422,
+          0.07912169043978855
+        ],
+        [
+          2589,
+          0.06914809852951856
+        ],
+        [
+          2594,
+          0.09992864389532112
+        ],
+        [
+          2649,
+          0.056074382072716505
+        ],
+        [
+          2660,
+          0.09189836700704736
+        ],
+        [
+          2724,
+          0.07604023156149467
+        ],
+        [
+          2725,
+          0.07669803532044203
+        ],
+        [
+          2795,
+          0.1406279686369939
+        ],
+        [
+          2796,
+          0.14212230611376414
+        ],
+        [
+          2810,
+          0.07359185350874292
+        ],
+        [
+          2875,
+          0.09935470482427569
+        ],
+        [
+          2876,
+          0.0999927135763266
+        ],
+        [
+          2978,
+          0.07076386524007777
+        ],
+        [
+          3151,
+          0.054432878896784505
+        ],
+        [
+          3296,
+          0.09031469707917288
+        ],
+        [
+          3421,
+          0.09813494113414624
+        ],
+        [
+          3422,
+          0.09997988724653509
+        ],
+        [
+          3428,
+          0.10026421603103404
+        ],
+        [
+          3568,
+          0.08661981577257685
+        ],
+        [
+          3569,
+          0.0999927135763266
+        ],
+        [
+          3661,
+          0.08336060575169119
+        ],
+        [
+          3663,
+          0.09997133980637067
+        ],
+        [
+          3781,
+          0.09993717757813754
+        ],
+        [
+          3782,
+          0.0999927135763266
+        ],
+        [
+          3941,
+          0.05971763166959996
+        ],
+        [
+          3994,
+          0.09290849998314166
+        ],
+        [
+          3995,
+          0.0998732418157206
+        ],
+        [
+          4007,
+          0.060199181631091836
+        ],
+        [
+          4130,
+          0.16247965359863464
+        ],
+        [
+          4243,
+          0.14122462587563211
+        ],
+        [
+          4244,
+          0.14212230611376414
+        ],
+        [
+          4254,
+          0.09901637593515247
+        ],
+        [
+          4323,
+          0.06366379826551982
+        ],
+        [
+          4346,
+          0.08682834144056993
+        ],
+        [
+          4357,
+          0.0750930902664503
+        ],
+        [
+          4358,
+          0.0888765986463595
+        ],
+        [
+          4478,
+          0.06569893173493163
+        ],
+        [
+          4493,
+          0.050258189821283314
+        ],
+        [
+          4545,
+          0.07252952484514237
+        ],
+        [
+          4551,
+          0.18953553313769006
+        ],
+        [
+          4626,
+          0.06847501882363981
+        ],
+        [
+          4640,
+          0.08323958180641648
+        ],
+        [
+          4760,
+          0.0677588032669706
+        ],
+        [
+          4763,
+          0.13466706016108973
+        ],
+        [
+          4769,
+          0.13858015461540926
+        ],
+        [
+          4785,
+          0.05707874987822651
+        ],
+        [
+          4786,
+          0.07994348343335378
+        ],
+        [
+          4842,
+          0.04866595482863463
+        ],
+        [
+          4864,
+          0.05099218476621503
+        ],
+        [
+          4942,
+          0.04967315050742502
+        ],
+        [
+          4956,
+          0.06662933405744538
+        ]
+      ]
+    },
+    {
+      "id": 10,
+      "label": 0,
+      "sender": "hadley wickham <h.wickham@gmail.com>",
+      "subject": "levelplot and unequal cell sizes",
+      "body": "Hadley and Deepayan Thank you for responding Here is a simple example of what I m talking about It is a grid that is 5 cells wide by 2 cells tall The width of the cells in the x direction is variable the cells at either end have width 4 units and the three cells in the middle have width 2 units My objective is to have the color contour boundaries fall on the cell boundaries instead of equidistant between cell nodes In the plot I want the cyan blue and orange gray boundaries to be located at the red cell boundary lines Also the colored regions should extend to the ends of the domain x 0 14 library lattice x.node y.node z contour.levels x.cell.boundary contour.colors print levelplot z x.node y.node panel function z panel.levelplot z panel.abline v x.cell.boundary col red xlim range x.cell.boundary at contour.levels colorkey list space top width 1 height 0 9 at 1 5 col contour.colors labels list labels z at z col.regions contour.colors region T contour F You are right panel.levelplot is indeed assuming that the boundaries are between consecutive midpoints There is no built in way around that there simply isn t enough information available to the panel function The cleanest solution in principle is to write your own panel function that ends up calling panel.polygon or grid.polygon panel.levelplot is a good starting point the only tricky part is getting the colors right almost everything else you can get rid of Maybe Hadley will have a simpler solution Sorry it s taken me so long to get back to you on this but I ve been travelling and internet access has been spotty You can do something very similar with ggtile which already has the width and height arguments build in but defaults to similar behaviour to lattice If you don t mind I ll include this example in the next version of ggplot so others can see how to use it Hadley R help stat.math.ethz ch mailing list https://stat.ethz.ch/mailman/listinfo/r-help PLEASE do read the posting guide http://www.R-project.org/posting-guide.html and provide commented minimal self contained reproducible code",
+      "normalized": {
+        "subject": "levelplot and unequal cell sizes",
+        "body": "hadley and deepayan thank you for responding here is a simple example of what i m talking about it is a grid that is 5 cells wide by 2 cells tall the width of the cells in the x direction is variable the cells at either end have width 4 units and the three cells in the middle have width 2 units my objective is to have the color contour boundaries fall on the cell boundaries instead of equidistant between cell nodes in the plot i want the cyan blue and orange gray boundaries to be located at the red cell boundary lines also the colored regions should extend to the ends of the domain x 0 14 library lattice x.node y.node z contour.levels x.cell.boundary contour.colors print levelplot z x.node y.node panel function z panel.levelplot z panel.abline v x.cell.boundary col red xlim range x.cell.boundary at contour.levels colorkey list space top width 1 height 0 9 at 1 5 col contour.colors labels list labels z at z col.regions contour.colors region t contour f you are right panel.levelplot is indeed assuming that the boundaries are between consecutive midpoints there is no built in way around that there simply isn t enough information available to the panel function the cleanest solution in principle is to write your own panel function that ends up calling panel.polygon or grid.polygon panel.levelplot is a good starting point the only tricky part is getting the colors right almost everything else you can get rid of maybe hadley will have a simpler solution sorry it s taken me so long to get back to you on this but i ve been travelling and internet access has been spotty you can do something very similar with ggtile which already has the width and height arguments build in but defaults to similar behaviour to lattice if you don t mind i ll include this example in the next version of ggplot so others can see how to use it hadley r help stat.math.ethz ch mailing list please do read the posting guide and provide commented minimal self contained reproducible code"
+      },
+      "engineered_features": {
+        "body_word_count": 351.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 9.0,
+        "name_email_consistency": 1.0,
+        "body_url_density": 0.8547008547008548,
+        "body_url_count": 3.0,
+        "body_entropy": 4.33294072041911,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.321928094887362,
+        "domain_length": 9.0,
+        "subject_entropy": 3.5530900835303276,
+        "body_avg_word_length": 4.905982905982906,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.6
+      },
+      "subject_tfidf_nonzero": [
+        [
+          298,
+          0.6982901212660685
+        ],
+        [
+          1613,
+          0.7158148549326282
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          75,
+          0.0630965578448028
+        ],
+        [
+          316,
+          0.0675381635673295
+        ],
+        [
+          509,
+          0.09110836490956108
+        ],
+        [
+          544,
+          0.09455111921472324
+        ],
+        [
+          590,
+          0.053016471092609714
+        ],
+        [
+          648,
+          0.0952871957033911
+        ],
+        [
+          691,
+          0.09096033202701448
+        ],
+        [
+          764,
+          0.0696545141980578
+        ],
+        [
+          767,
+          0.08269162242192755
+        ],
+        [
+          805,
+          0.08304856259261373
+        ],
+        [
+          864,
+          0.23958656461370526
+        ],
+        [
+          879,
+          0.055846108752250684
+        ],
+        [
+          880,
+          0.05681084610611996
+        ],
+        [
+          989,
+          0.046869904779583096
+        ],
+        [
+          992,
+          0.2086401654963788
+        ],
+        [
+          998,
+          0.08642273288708613
+        ],
+        [
+          999,
+          0.24163042093589882
+        ],
+        [
+          1025,
+          0.055881183241597326
+        ],
+        [
+          1026,
+          0.056301409041313186
+        ],
+        [
+          1121,
+          0.05471309939425295
+        ],
+        [
+          1122,
+          0.056301409041313186
+        ],
+        [
+          1395,
+          0.09133320387172501
+        ],
+        [
+          1454,
+          0.08142108798441858
+        ],
+        [
+          1456,
+          0.04415936149655185
+        ],
+        [
+          1581,
+          0.05681084610611996
+        ],
+        [
+          1584,
+          0.16116915979926233
+        ],
+        [
+          1640,
+          0.05677600591473156
+        ],
+        [
+          1641,
+          0.05677600591473156
+        ],
+        [
+          1664,
+          0.10548631114905663
+        ],
+        [
+          1712,
+          0.09781955358713947
+        ],
+        [
+          1743,
+          0.08463247201575123
+        ],
+        [
+          1905,
+          0.13282417040015254
+        ],
+        [
+          1948,
+          0.06499673074181786
+        ],
+        [
+          1982,
+          0.05099893662925764
+        ],
+        [
+          2015,
+          0.10035555608735036
+        ],
+        [
+          2025,
+          0.15323154353886675
+        ],
+        [
+          2041,
+          0.054594505925960775
+        ],
+        [
+          2042,
+          0.056320684623198454
+        ],
+        [
+          2108,
+          0.17646952577165814
+        ],
+        [
+          2112,
+          0.043097476552696586
+        ],
+        [
+          2115,
+          0.05678346482717865
+        ],
+        [
+          2252,
+          0.06203437505630172
+        ],
+        [
+          2284,
+          0.048957537253473266
+        ],
+        [
+          2285,
+          0.0937901732807587
+        ],
+        [
+          2303,
+          0.06658281697480109
+        ],
+        [
+          2332,
+          0.0651222918223995
+        ],
+        [
+          2368,
+          0.06944975753533984
+        ],
+        [
+          2483,
+          0.17095166352439442
+        ],
+        [
+          2549,
+          0.15537566013602025
+        ],
+        [
+          2556,
+          0.07323923959184549
+        ],
+        [
+          2579,
+          0.07588745016277104
+        ],
+        [
+          2589,
+          0.08170777106807212
+        ],
+        [
+          2594,
+          0.056265334279578846
+        ],
+        [
+          2615,
+          0.055843773380791946
+        ],
+        [
+          2634,
+          0.09332276830822625
+        ],
+        [
+          2644,
+          0.05991228895183254
+        ],
+        [
+          2724,
+          0.04281484147814404
+        ],
+        [
+          2725,
+          0.043185221250597546
+        ],
+        [
+          2795,
+          0.05618149735330304
+        ],
+        [
+          2796,
+          0.05677849180476114
+        ],
+        [
+          2803,
+          0.06876832190184727
+        ],
+        [
+          2860,
+          0.08877205136278725
+        ],
+        [
+          2874,
+          0.07294262721584095
+        ],
+        [
+          2875,
+          0.05594217494878366
+        ],
+        [
+          2876,
+          0.056301409041313186
+        ],
+        [
+          3042,
+          0.24943290882545682
+        ],
+        [
+          3043,
+          0.10579841123936186
+        ],
+        [
+          3190,
+          0.2837232598208599
+        ],
+        [
+          3377,
+          0.08403407119495705
+        ],
+        [
+          3390,
+          0.0650053562992079
+        ],
+        [
+          3421,
+          0.05525538076153222
+        ],
+        [
+          3422,
+          0.05629418711069182
+        ],
+        [
+          3488,
+          0.07035394630510444
+        ],
+        [
+          3568,
+          0.048771730503867766
+        ],
+        [
+          3569,
+          0.056301409041313186
+        ],
+        [
+          3641,
+          0.07786401012444698
+        ],
+        [
+          3661,
+          0.046936615624248446
+        ],
+        [
+          3663,
+          0.056289374430770034
+        ],
+        [
+          3697,
+          0.13886490349586064
+        ],
+        [
+          3713,
+          0.09805462185708798
+        ],
+        [
+          3781,
+          0.05627013921335544
+        ],
+        [
+          3782,
+          0.056301409041313186
+        ],
+        [
+          3845,
+          0.08764922696112411
+        ],
+        [
+          3846,
+          0.08786211179486535
+        ],
+        [
+          3994,
+          0.05231260632778861
+        ],
+        [
+          3995,
+          0.056234139855167634
+        ],
+        [
+          4080,
+          0.12410646246102877
+        ],
+        [
+          4082,
+          0.06716460231488215
+        ],
+        [
+          4083,
+          0.06645391285703214
+        ],
+        [
+          4147,
+          0.11747088476270577
+        ],
+        [
+          4159,
+          0.07384295413015306
+        ],
+        [
+          4181,
+          0.07482605963352769
+        ],
+        [
+          4241,
+          0.08213769887395768
+        ],
+        [
+          4243,
+          0.05641986456715302
+        ],
+        [
+          4244,
+          0.05677849180476114
+        ],
+        [
+          4422,
+          0.06958399504335745
+        ],
+        [
+          4429,
+          0.08182826002035491
+        ],
+        [
+          4491,
+          0.06035742532958042
+        ],
+        [
+          4715,
+          0.04185248108065229
+        ],
+        [
+          4769,
+          0.07802826517009112
+        ],
+        [
+          4774,
+          0.053569550908996996
+        ],
+        [
+          4785,
+          0.054415180508461565
+        ],
+        [
+          4842,
+          0.04639496699325874
+        ],
+        [
+          4864,
+          0.048612643838453824
+        ],
+        [
+          4903,
+          0.07618553896755363
+        ],
+        [
+          4904,
+          0.2425563659023498
+        ],
+        [
+          4956,
+          0.0635200884327274
+        ]
+      ]
+    },
+    {
+      "id": 11,
+      "label": 0,
+      "sender": "<metze@samba.org>",
+      "subject": "svn commit samba r22217 in branches SAMBA 4 0 source lib replace system",
+      "body": "Author metze Date 2007 04 15 16 30 01 0000 Sun 15 Apr 2007 New Revision 22217 WebSVN http://websvn.samba.org/cgi-bin/viewcvs.cgi?view=rev&root=samba&rev=22217 Log merge from samba3 21944 move acl header checks to the correct place only metze Modified branches SAMBA_4_0 source lib replace system config m4 branches SAMBA_4_0 source lib replace system filesys h Changeset Modified branches SAMBA_4_0 source lib replace system config m4 branches SAMBA_4_0 source lib replace system config m4 2007 04 15 16 13 06 UTC rev 22216 branches SAMBA_4_0 source lib replace system config m4 2007 04 15 16 30 01 UTC rev 22217 1 6 1 7 filesys AC_HEADER_DIRENT AC_CHECK_HEADERS fcntl h sys fcntl h sys acl h sys resource h sys ioctl h sys mode h sys filio h sys fs s5param h sys filsys h AC_CHECK_HEADERS fcntl h sys fcntl h sys resource h sys ioctl h sys mode h sys filio h sys fs s5param h sys filsys h AC_CHECK_HEADERS sys acl h acl libacl h select AC_CHECK_HEADERS sys select h Modified branches SAMBA_4_0 source lib replace system filesys h branches SAMBA_4_0 source lib replace system filesys h 2007 04 15 16 13 06 UTC rev 22216 branches SAMBA_4_0 source lib replace system filesys h 2007 04 15 16 30 01 UTC rev 22217 41 6 41 10 include endif ifdef HAVE_ACL_LIBACL_H include endif ifdef HAVE_SYS_FS_S5PARAM_H include endif",
+      "normalized": {
+        "subject": "svn commit samba r22217 in branches samba 4 0 source lib replace system",
+        "body": "author metze date 2007 04 15 16 30 01 0000 sun 15 apr 2007 new revision 22217 websvn log merge from samba3 21944 move acl header checks to the correct place only metze modified branches samba_4_0 source lib replace system config m4 branches samba_4_0 source lib replace system filesys h changeset modified branches samba_4_0 source lib replace system config m4 branches samba_4_0 source lib replace system config m4 2007 04 15 16 13 06 utc rev 22216 branches samba_4_0 source lib replace system config m4 2007 04 15 16 30 01 utc rev 22217 1 6 1 7 filesys ac_header_dirent ac_check_headers fcntl h sys fcntl h sys acl h sys resource h sys ioctl h sys mode h sys filio h sys fs s5param h sys filsys h ac_check_headers fcntl h sys fcntl h sys resource h sys ioctl h sys mode h sys filio h sys fs s5param h sys filsys h ac_check_headers sys acl h acl libacl h select ac_check_headers sys select h modified branches samba_4_0 source lib replace system filesys h branches samba_4_0 source lib replace system filesys h 2007 04 15 16 13 06 utc rev 22216 branches samba_4_0 source lib replace system filesys h 2007 04 15 16 30 01 utc rev 22217 41 6 41 10 include endif ifdef have_acl_libacl_h include endif ifdef have_sys_fs_s5param_h include endif"
+      },
+      "engineered_features": {
+        "body_word_count": 223.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 5.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.4484304932735426,
+        "body_url_count": 1.0,
+        "body_entropy": 4.6661439052800135,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 1.9219280948873623,
+        "domain_length": 9.0,
+        "subject_entropy": 4.142893847428041,
+        "body_avg_word_length": 4.8923766816143495,
+        "sender_name_exists": 0.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.6
+      },
+      "subject_tfidf_nonzero": [
+        [
+          245,
+          0.3157763706301109
+        ],
+        [
+          355,
+          0.3077222893386314
+        ],
+        [
+          958,
+          0.3937319508696988
+        ],
+        [
+          1475,
+          0.4713674592289134
+        ],
+        [
+          1532,
+          0.4917731269085476
+        ],
+        [
+          1645,
+          0.3063523388586889
+        ],
+        [
+          1735,
+          0.30444635285495997
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          12,
+          0.05608188949627651
+        ],
+        [
+          14,
+          0.1171977064449228
+        ],
+        [
+          21,
+          0.1391431464930955
+        ],
+        [
+          26,
+          0.09025704632372383
+        ],
+        [
+          43,
+          0.03547886239576631
+        ],
+        [
+          74,
+          0.08685942146821848
+        ],
+        [
+          80,
+          0.1284272749665302
+        ],
+        [
+          84,
+          0.13432034212217536
+        ],
+        [
+          109,
+          0.10507777723438497
+        ],
+        [
+          110,
+          0.17343773004343208
+        ],
+        [
+          118,
+          0.05939025057904966
+        ],
+        [
+          143,
+          0.0966438607471326
+        ],
+        [
+          171,
+          0.11182073486288308
+        ],
+        [
+          496,
+          0.06424925194974936
+        ],
+        [
+          497,
+          0.07140120296352982
+        ],
+        [
+          577,
+          0.054228518650928245
+        ],
+        [
+          727,
+          0.17731884878993587
+        ],
+        [
+          732,
+          0.22659144590215213
+        ],
+        [
+          892,
+          0.06180424481901584
+        ],
+        [
+          893,
+          0.06405269690294545
+        ],
+        [
+          920,
+          0.07593332946799236
+        ],
+        [
+          1089,
+          0.15843585340466496
+        ],
+        [
+          1159,
+          0.059609366939318884
+        ],
+        [
+          1251,
+          0.046256078332619174
+        ],
+        [
+          1252,
+          0.060370444735615016
+        ],
+        [
+          1583,
+          0.1739198727853899
+        ],
+        [
+          2090,
+          0.06684176372760654
+        ],
+        [
+          2252,
+          0.1034564088107066
+        ],
+        [
+          2553,
+          0.18214679271144185
+        ],
+        [
+          2554,
+          0.28279355019183033
+        ],
+        [
+          2637,
+          0.05126735643094189
+        ],
+        [
+          2699,
+          0.22088623263409696
+        ],
+        [
+          2839,
+          0.07338770941758173
+        ],
+        [
+          2851,
+          0.1279469288716662
+        ],
+        [
+          2904,
+          0.1113576868784424
+        ],
+        [
+          2909,
+          0.11471458245240676
+        ],
+        [
+          2910,
+          0.13226770494227608
+        ],
+        [
+          3015,
+          0.031378642439888804
+        ],
+        [
+          3020,
+          0.05962948878580613
+        ],
+        [
+          3347,
+          0.047842489364621855
+        ],
+        [
+          3760,
+          0.21280014464881244
+        ],
+        [
+          3807,
+          0.1287922197796283
+        ],
+        [
+          3831,
+          0.14031392792280142
+        ],
+        [
+          3835,
+          0.05278701112651342
+        ],
+        [
+          3913,
+          0.222058958682746
+        ],
+        [
+          3914,
+          0.22795713014743452
+        ],
+        [
+          3991,
+          0.1144663401989794
+        ],
+        [
+          4164,
+          0.14761241366628988
+        ],
+        [
+          4167,
+          0.24627022805045665
+        ],
+        [
+          4360,
+          0.060888957337851594
+        ],
+        [
+          4416,
+          0.29046239068152213
+        ],
+        [
+          4738,
+          0.1468363202753918
+        ],
+        [
+          4739,
+          0.15115582878409317
+        ],
+        [
+          4879,
+          0.06088149472316081
+        ],
+        [
+          4880,
+          0.06098640100342685
+        ]
+      ]
+    },
+    {
+      "id": 12,
+      "label": 0,
+      "sender": "Rok Lenarcic <zvo.zxlpqrmv@gvc.ceas-challenge.cc>",
+      "subject": "Star Wars geeki",
+      "body": "Funny this is",
+      "normalized": {
+        "subject": "star wars geeki",
+        "body": "funny this is"
+      },
+      "engineered_features": {
+        "body_word_count": 3.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 12.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 2.913977073182752,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.30827083453526,
+        "domain_length": 21.0,
+        "subject_entropy": 3.085055102756477,
+        "body_avg_word_length": 3.6666666666666665,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.38461538461538464
+      },
+      "subject_tfidf_nonzero": [],
+      "body_tfidf_nonzero": []
+    },
+    {
+      "id": 13,
+      "label": 0,
+      "sender": "Ian Davidson <ltuesssi@cs.albany.edu>",
+      "subject": "Call For Papers Tutorials and Workshops SIAM DM 2006",
+      "body": "CALL FOR PAPERS WORKSHOPS AND TUTORIALS Sixth SIAM International Conference on Data Mining http://www.siam.org/meetings/sdm06 Washington DC USA April 20 22 2006 Hyatt Regency Bethesda Bethesda Maryland The Sixth SIAM International Conference on Data Mining will provide a forum for the presentation of peer reviewed recent results in all aspects of data mining The conference program will also include keynote talks and tutorials by leading experts as well as several workshops on topics of current interest Proceedings of the conference will be available both online at the SIAM Web site and in hard copy form The online proceedings of the last SIAM data mining conference which was held in Newport Beach CA is available at http://www.siam.org/meetings/sdm05. Paper submission dead line October 3rd 2005 Tutorial submission dead line October 3rd 2005 Workshop submission dead line October 3rd 2005 Further details regarding submission requirements can be found at http www.siam.org/meetings/sdm06",
+      "normalized": {
+        "subject": "call for papers tutorials and workshops siam dm 2006",
+        "body": "call for papers workshops and tutorials sixth siam international conference on data mining washington dc usa april 20 22 2006 hyatt regency bethesda bethesda maryland the sixth siam international conference on data mining will provide a forum for the presentation of peer reviewed recent results in all aspects of data mining the conference program will also include keynote talks and tutorials by leading experts as well as several workshops on topics of current interest proceedings of the conference will be available both online at the siam web site and in hard copy form the online proceedings of the last siam data mining conference which was held in newport beach ca is available at paper submission dead line october 3rd 2005 tutorial submission dead line october 3rd 2005 workshop submission dead line october 3rd 2005 further details regarding submission requirements can be found at http"
+      },
+      "engineered_features": {
+        "body_word_count": 147.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 8.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 3.4013605442176873,
+        "body_url_count": 5.0,
+        "body_entropy": 4.394377596334472,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.94770277922009,
+        "domain_length": 13.0,
+        "subject_entropy": 4.124680346973648,
+        "body_avg_word_length": 5.789115646258503,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.5714285714285714
+      },
+      "subject_tfidf_nonzero": [
+        [
+          38,
+          0.7273286159773714
+        ],
+        [
+          1223,
+          0.6862893590756317
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          97,
+          0.07091059819090971
+        ],
+        [
+          107,
+          0.21949007410166688
+        ],
+        [
+          108,
+          0.09438971014247301
+        ],
+        [
+          125,
+          0.08233831978397474
+        ],
+        [
+          167,
+          0.23454426586588728
+        ],
+        [
+          498,
+          0.09417191004854886
+        ],
+        [
+          590,
+          0.11067676861329308
+        ],
+        [
+          633,
+          0.1212419788085822
+        ],
+        [
+          792,
+          0.07261997683920468
+        ],
+        [
+          1082,
+          0.2708659837499561
+        ],
+        [
+          1148,
+          0.08822533687478912
+        ],
+        [
+          1216,
+          0.07864846577488724
+        ],
+        [
+          1246,
+          0.16622869118095032
+        ],
+        [
+          1248,
+          0.3203559681843876
+        ],
+        [
+          1265,
+          0.11661681492555974
+        ],
+        [
+          1266,
+          0.2197012426774985
+        ],
+        [
+          1355,
+          0.07455156326512159
+        ],
+        [
+          1700,
+          0.10886123056254157
+        ],
+        [
+          1861,
+          0.07822681765378534
+        ],
+        [
+          1868,
+          0.12089797079003808
+        ],
+        [
+          2075,
+          0.0845712522772465
+        ],
+        [
+          2110,
+          0.1007442591175433
+        ],
+        [
+          2192,
+          0.10669075161466948
+        ],
+        [
+          2252,
+          0.07648624737409968
+        ],
+        [
+          2331,
+          0.1553995604955983
+        ],
+        [
+          2526,
+          0.10024617486544303
+        ],
+        [
+          2575,
+          0.14144801818820793
+        ],
+        [
+          2878,
+          0.28579470142886176
+        ],
+        [
+          3084,
+          0.2152652484407501
+        ],
+        [
+          3120,
+          0.11704066813930375
+        ],
+        [
+          3191,
+          0.0989015583034984
+        ],
+        [
+          3192,
+          0.10596288146946979
+        ],
+        [
+          3454,
+          0.12032280231898555
+        ],
+        [
+          3510,
+          0.2116925678377847
+        ],
+        [
+          3537,
+          0.07915543736710444
+        ],
+        [
+          3568,
+          0.06013386353608162
+        ],
+        [
+          3686,
+          0.09385556769399452
+        ],
+        [
+          3709,
+          0.09274708802186014
+        ],
+        [
+          3797,
+          0.1115553085887798
+        ],
+        [
+          3820,
+          0.08032036629578133
+        ],
+        [
+          4089,
+          0.0689747745164585
+        ],
+        [
+          4325,
+          0.2606905493331637
+        ],
+        [
+          4430,
+          0.11958284765290171
+        ],
+        [
+          4567,
+          0.10357309024232597
+        ],
+        [
+          4647,
+          0.12843328392219938
+        ],
+        [
+          4708,
+          0.08715965605438886
+        ],
+        [
+          4854,
+          0.10564131429366455
+        ],
+        [
+          4871,
+          0.06902120505043036
+        ],
+        [
+          4875,
+          0.09250609992595
+        ],
+        [
+          4948,
+          0.11887149753300087
+        ]
+      ]
+    },
+    {
+      "id": 14,
+      "label": 0,
+      "sender": "Aaron Kulkis <cmiqlkx91@hotpop.com>",
+      "subject": "openSUSE 11 0 and the Non ready KDE4",
+      "body": "Philippe Landau wrote Cristian Rodríguez wrote Anders Johansson escribió I personally suspect the new version of gcc do you have any real proof that the compiler is the thing to blame ? otherwise your suspicions are just BS Does BS stand for bull shit ? Yes Is this the language desired on this list when addressing thoughts expressed by list mates ? I think you re over reacting From nsswsfqosxmxji nashvillenursery.com Sat Apr 26 15 52 24 2008 Return Path Delivered To ybmjp molsci.org X Spam Status No hits ? required ? Message ID From Lorena Aguilar To Subject Autodesk AutoCAD 2008 OEM version Date Fri 29 Feb 2008 21 29 50 0800 Content Type text plain format flowed charset us ascii reply type original Content Transfer Encoding 7bit X Spam Not detected These are the attributes I see in these messages 1 They all take long time to process Longer time than my set timeout of 50 seconds 2 Most of them have phishing links I m still trying to out if what is the cause also Regards Frank Greetings I have utilised Spam Assasin for many years through a couple of hosting accounts however over recent months I started getting a large volume of emails that had semingly been passed through by Spam Assasin marked as not spam but with no values in the other SA headers Below is an example of what the SA headers look like on every single one of these emails I ve gotten almost 100 in the last 3 days alone! X Spam Status No score X Spam Score X Spam Bar X Spam Flag NO Although spam assassin continued to filter out most spam correctly the volume of these emails being delivered increased until my mailbox was being inundated and my hosting company were either unwilling or unable to deal with the problem Consequently I recently switched to a different host but after a week or three of smooth running I started receiving emails with identical invalid headers and now I find myself drowning in them once again with another hosting company seemingly unable to identify or correct the issue If anyone can help me with this I would be MOST grateful thanks! fLaMePr0oF",
+      "normalized": {
+        "subject": "opensuse 11 0 and the non ready kde4",
+        "body": "philippe landau wrote cristian rodríguez wrote anders johansson escribió i personally suspect the new version of gcc do you have any real proof that the compiler is the thing to blame otherwise your suspicions are just bs does bs stand for bull shit yes is this the language desired on this list when addressing thoughts expressed by list mates i think you re over reacting from nsswsfqosxmxji nashvillenursery.com sat apr 26 15 52 24 2008 return path delivered to ybmjp molsci.org x spam status no hits required message id from lorena aguilar to subject autodesk autocad 2008 oem version date fri 29 feb 2008 21 29 50 0800 content type text plain format flowed charset us ascii reply type original content transfer encoding 7bit x spam not detected these are the attributes i see in these messages 1 they all take long time to process longer time than my set timeout of 50 seconds 2 most of them have phishing links i m still trying to out if what is the cause also regards frank greetings i have utilised spam assasin for many years through a couple of hosting accounts however over recent months i started getting a large volume of emails that had semingly been passed through by spam assasin marked as not spam but with no values in the other sa headers below is an example of what the sa headers look like on every single one of these emails i ve gotten almost 100 in the last 3 days alone x spam status no score x spam score x spam bar x spam flag no although spam assassin continued to filter out most spam correctly the volume of these emails being delivered increased until my mailbox was being inundated and my hosting company were either unwilling or unable to deal with the problem consequently i recently switched to a different host but after a week or three of smooth running i started receiving emails with identical invalid headers and now i find myself drowning in them once again with another hosting company seemingly unable to identify or correct the issue if anyone can help me with this i would be most grateful thanks flamepr0of"
+      },
+      "engineered_features": {
+        "body_word_count": 372.0,
+        "body_exclamation_count": 2.0,
+        "email_local_length": 9.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 4.379559850215937,
+        "email_digit_ratio": 0.2222222222222222,
+        "domain_entropy": 1.9182958340544896,
+        "domain_length": 10.0,
+        "subject_entropy": 3.7419627890379075,
+        "body_avg_word_length": 4.551075268817204,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.5
+      },
+      "subject_tfidf_nonzero": [
+        [
+          23,
+          0.43703514318124315
+        ],
+        [
+          919,
+          0.4957516915737803
+        ],
+        [
+          1154,
+          0.45181234850664337
+        ],
+        [
+          1191,
+          0.4443442039078531
+        ],
+        [
+          1422,
+          0.40206264949220694
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          30,
+          0.09335563869597509
+        ],
+        [
+          59,
+          0.05787662392567999
+        ],
+        [
+          80,
+          0.05571974232595967
+        ],
+        [
+          119,
+          0.10204242831476124
+        ],
+        [
+          124,
+          0.06390119524676795
+        ],
+        [
+          127,
+          0.06221400922405109
+        ],
+        [
+          132,
+          0.06855709374896737
+        ],
+        [
+          137,
+          0.1165619609768693
+        ],
+        [
+          190,
+          0.10828685917854272
+        ],
+        [
+          196,
+          0.0751258726784524
+        ],
+        [
+          323,
+          0.08233968134743667
+        ],
+        [
+          496,
+          0.07782119675987254
+        ],
+        [
+          525,
+          0.09095004497954982
+        ],
+        [
+          567,
+          0.0981404474441002
+        ],
+        [
+          581,
+          0.0763941110362115
+        ],
+        [
+          583,
+          0.07670168405772873
+        ],
+        [
+          584,
+          0.07692548150026077
+        ],
+        [
+          617,
+          0.08731934257280219
+        ],
+        [
+          850,
+          0.0748792565083539
+        ],
+        [
+          909,
+          0.0854066428536403
+        ],
+        [
+          1002,
+          0.04002592463178474
+        ],
+        [
+          1046,
+          0.08356459425515834
+        ],
+        [
+          1058,
+          0.08891600998863787
+        ],
+        [
+          1126,
+          0.11618413197545283
+        ],
+        [
+          1127,
+          0.09256393514121321
+        ],
+        [
+          1128,
+          0.08436662885716699
+        ],
+        [
+          1133,
+          0.0919734065975209
+        ],
+        [
+          1159,
+          0.07220118729077704
+        ],
+        [
+          1160,
+          0.08149382047874022
+        ],
+        [
+          1173,
+          0.07738381399514897
+        ],
+        [
+          1251,
+          0.05602716395948445
+        ],
+        [
+          1263,
+          0.06171640077844759
+        ],
+        [
+          1268,
+          0.058231395168208085
+        ],
+        [
+          1322,
+          0.13513622576986356
+        ],
+        [
+          1348,
+          0.09434436665549985
+        ],
+        [
+          1386,
+          0.05869943346993081
+        ],
+        [
+          1440,
+          0.0481335899416013
+        ],
+        [
+          1564,
+          0.18248085856675658
+        ],
+        [
+          1578,
+          0.08518451255640223
+        ],
+        [
+          1664,
+          0.05996861231294354
+        ],
+        [
+          1777,
+          0.08524475375707057
+        ],
+        [
+          1778,
+          0.09838945723527517
+        ],
+        [
+          1805,
+          0.08958067546504404
+        ],
+        [
+          1822,
+          0.08858216553352512
+        ],
+        [
+          1863,
+          0.0728402171955336
+        ],
+        [
+          1882,
+          0.08724976613992841
+        ],
+        [
+          1895,
+          0.06986863108490808
+        ],
+        [
+          1926,
+          0.09457364022253667
+        ],
+        [
+          1948,
+          0.06256250339613761
+        ],
+        [
+          1993,
+          0.09300604711052793
+        ],
+        [
+          2022,
+          0.0887096508891351
+        ],
+        [
+          2091,
+          0.18579326539781532
+        ],
+        [
+          2112,
+          0.041483409894927124
+        ],
+        [
+          2150,
+          0.09419352531921242
+        ],
+        [
+          2173,
+          0.08235612955222193
+        ],
+        [
+          2174,
+          0.20923935361567525
+        ],
+        [
+          2208,
+          0.06867092141107317
+        ],
+        [
+          2216,
+          0.09472854744077608
+        ],
+        [
+          2263,
+          0.08212755078292377
+        ],
+        [
+          2342,
+          0.09434436665549985
+        ],
+        [
+          2371,
+          0.06257080591316191
+        ],
+        [
+          2425,
+          0.039644543320320295
+        ],
+        [
+          2495,
+          0.07525580578594064
+        ],
+        [
+          2500,
+          0.06551451202191104
+        ],
+        [
+          2568,
+          0.039010422460111195
+        ],
+        [
+          2581,
+          0.07661313212680688
+        ],
+        [
+          2589,
+          0.06345246076985846
+        ],
+        [
+          2644,
+          0.057668481756542087
+        ],
+        [
+          2646,
+          0.09065379726116095
+        ],
+        [
+          2647,
+          0.06596490846370207
+        ],
+        [
+          2649,
+          0.05145560911041108
+        ],
+        [
+          2651,
+          0.0893378386085766
+        ],
+        [
+          2723,
+          0.0896899345870972
+        ],
+        [
+          2777,
+          0.09528426608915347
+        ],
+        [
+          2841,
+          0.047714114678610024
+        ],
+        [
+          2844,
+          0.0928003036618692
+        ],
+        [
+          2846,
+          0.06682640431745664
+        ],
+        [
+          2938,
+          0.06490579749581624
+        ],
+        [
+          3015,
+          0.038007034062935874
+        ],
+        [
+          3087,
+          0.0808571812853428
+        ],
+        [
+          3151,
+          0.0499493143880774
+        ],
+        [
+          3158,
+          0.06475031401359341
+        ],
+        [
+          3222,
+          0.08049120364476686
+        ],
+        [
+          3239,
+          0.0744837513618091
+        ],
+        [
+          3290,
+          0.08561160360923038
+        ],
+        [
+          3302,
+          0.09033482844261843
+        ],
+        [
+          3352,
+          0.07717575316242237
+        ],
+        [
+          3506,
+          0.051966490234920476
+        ],
+        [
+          3511,
+          0.06079941779437021
+        ],
+        [
+          3667,
+          0.056476519440578875
+        ],
+        [
+          3685,
+          0.0716751965762639
+        ],
+        [
+          3686,
+          0.07327093006413761
+        ],
+        [
+          3687,
+          0.07426655851586655
+        ],
+        [
+          3711,
+          0.05441472220805575
+        ],
+        [
+          3768,
+          0.061460454644158
+        ],
+        [
+          3795,
+          0.06632704415095446
+        ],
+        [
+          3825,
+          0.060223777245517696
+        ],
+        [
+          3886,
+          0.06287293748527076
+        ],
+        [
+          3889,
+          0.13485767729389328
+        ],
+        [
+          3925,
+          0.07917976769791302
+        ],
+        [
+          3960,
+          0.14356065081116026
+        ],
+        [
+          3976,
+          0.08650587031257628
+        ],
+        [
+          4026,
+          0.05356919651010386
+        ],
+        [
+          4085,
+          0.07194375589658498
+        ],
+        [
+          4124,
+          0.0934621967021716
+        ],
+        [
+          4184,
+          0.24597060549076424
+        ],
+        [
+          4232,
+          0.06878565808808997
+        ],
+        [
+          4240,
+          0.1188174863836361
+        ],
+        [
+          4258,
+          0.11396414020929815
+        ],
+        [
+          4323,
+          0.05841989509196131
+        ],
+        [
+          4394,
+          0.06687114551456455
+        ],
+        [
+          4487,
+          0.06415394854006547
+        ],
+        [
+          4488,
+          0.08550875774910023
+        ],
+        [
+          4493,
+          0.04611848895075152
+        ],
+        [
+          4506,
+          0.05453764337181199
+        ],
+        [
+          4509,
+          0.0489322072476924
+        ],
+        [
+          4517,
+          0.09019215095122894
+        ],
+        [
+          4539,
+          0.06400669368728014
+        ],
+        [
+          4544,
+          0.10196438047219354
+        ],
+        [
+          4597,
+          0.06394682089740261
+        ],
+        [
+          4598,
+          0.09243059306754779
+        ],
+        [
+          4638,
+          0.06029448361514279
+        ],
+        [
+          4653,
+          0.10245015986398838
+        ],
+        [
+          4654,
+          0.08563226142056886
+        ],
+        [
+          4662,
+          0.13504302143703864
+        ],
+        [
+          4763,
+          0.07298521551155655
+        ],
+        [
+          4774,
+          0.05156328899043263
+        ],
+        [
+          4785,
+          0.0886823905610112
+        ],
+        [
+          4831,
+          0.13051496375765778
+        ],
+        [
+          4883,
+          0.05952513558415871
+        ],
+        [
+          4961,
+          0.08891172176569585
+        ],
+        [
+          4985,
+          0.05753332631318297
+        ],
+        [
+          4988,
+          0.06229932478975033
+        ]
+      ]
+    },
+    {
+      "id": 15,
+      "label": 1,
+      "sender": "Pelletier Jarred <JarredfPelletier@commerceteam.com>",
+      "subject": "Wanted People like you",
+      "body": "Do you want 15OO to 3OOO weekly daily Simply Returning phone calls for us Always wanted to stay at your place? Great then call the info line for details 8OO 472 9246 He escaped from slavery to New Bedford Massachusetts in 1838 There he discovered the newspaper of the leading white abolitionist William Lloyd Garrison The Liberator Spielass and Garrison soon impressed one another and would work together for social reform and the abolition of slavery Because of his speaking ability Spielass soon became the major drawing card at meetings of the abolitionist society A deep melodious voice grace and a flair for the dramatic would allow Spielass to mesmerize his listeners at the abolitionist meetings You can simply reply back to request to be re_m0v ed",
+      "normalized": {
+        "subject": "wanted people like you",
+        "body": "do you want 15oo to 3ooo weekly daily simply returning phone calls for us always wanted to stay at your place great then call the info line for details 8oo 472 9246 he escaped from slavery to new bedford massachusetts in 1838 there he discovered the newspaper of the leading white abolitionist william lloyd garrison the liberator spielass and garrison soon impressed one another and would work together for social reform and the abolition of slavery because of his speaking ability spielass soon became the major drawing card at meetings of the abolitionist society a deep melodious voice grace and a flair for the dramatic would allow spielass to mesmerize his listeners at the abolitionist meetings you can simply reply back to request to be re_m0v ed"
+      },
+      "engineered_features": {
+        "body_word_count": 127.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 16.0,
+        "name_email_consistency": 1.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 4.318341015148697,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.625814583693911,
+        "domain_length": 16.0,
+        "subject_entropy": 3.511085408180427,
+        "body_avg_word_length": 4.952755905511811,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.6666666666666666
+      },
+      "subject_tfidf_nonzero": [
+        [
+          969,
+          0.5136037181692125
+        ],
+        [
+          1264,
+          0.5871566601808546
+        ],
+        [
+          1927,
+          0.6256662665415361
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          297,
+          0.19379251648993162
+        ],
+        [
+          425,
+          0.15759177549911443
+        ],
+        [
+          806,
+          0.158521426741703
+        ],
+        [
+          828,
+          0.17310484164446044
+        ],
+        [
+          1234,
+          0.1301149389586371
+        ],
+        [
+          1301,
+          0.19533568535527096
+        ],
+        [
+          1355,
+          0.13472302196331198
+        ],
+        [
+          1411,
+          0.18121340322784166
+        ],
+        [
+          1528,
+          0.19455515133139586
+        ],
+        [
+          2000,
+          0.181013140026218
+        ],
+        [
+          2016,
+          0.12161369031423411
+        ],
+        [
+          2282,
+          0.15377186464313852
+        ],
+        [
+          2526,
+          0.18115606201451084
+        ],
+        [
+          2575,
+          0.12180068106477195
+        ],
+        [
+          2736,
+          0.16200455199348035
+        ],
+        [
+          3015,
+          0.08797866710560648
+        ],
+        [
+          3303,
+          0.14571541619706552
+        ],
+        [
+          3347,
+          0.13413959680941828
+        ],
+        [
+          3768,
+          0.14226863559897365
+        ],
+        [
+          3790,
+          0.15411310388163957
+        ],
+        [
+          3829,
+          0.2127515314683448
+        ],
+        [
+          4083,
+          0.25069823306206546
+        ],
+        [
+          4133,
+          0.1765116105733436
+        ],
+        [
+          4134,
+          0.19164348329429176
+        ],
+        [
+          4157,
+          0.24071627482083324
+        ],
+        [
+          4190,
+          0.2033881528659326
+        ],
+        [
+          4259,
+          0.1619562705011007
+        ],
+        [
+          4829,
+          0.17443533488221294
+        ],
+        [
+          4842,
+          0.10337294134462928
+        ],
+        [
+          4845,
+          0.16657230980887158
+        ],
+        [
+          4888,
+          0.2136524776353302
+        ],
+        [
+          4901,
+          0.16810363430364622
+        ],
+        [
+          4907,
+          0.2170131025085932
+        ],
+        [
+          4942,
+          0.10551235852431444
+        ]
+      ]
+    },
+    {
+      "id": 16,
+      "label": 1,
+      "sender": "Daniel Rivers <widowerunbeaten@mailite.com>",
+      "subject": "re Special offer from our store",
+      "body": "Dear customer.Do you shop for drugs on the Web regularly? If yes read this letter to the end since it contains the information you will definitely find useful High price proves the high quality of the drug That s what all Web pharmacies say in their ads All except CanadianPharmacy Drug sales tax is much lower here in Canada so we don t have any trouble dumping our rivals into tears CanadianPharmacy generic quality CAN be cheap.CanadianPharmacy the easiest and the cheapest way to take care of your health.Yours faithfully Daniel Rivers",
+      "normalized": {
+        "subject": "re special offer from our store",
+        "body": "dear customer.do you shop for drugs on the web regularly if yes read this letter to the end since it contains the information you will definitely find useful high price proves the high quality of the drug that s what all web pharmacies say in their ads all except canadianpharmacy drug sales tax is much lower here in canada so we don t have any trouble dumping our rivals into tears canadianpharmacy generic quality can be cheap.canadianpharmacy the easiest and the cheapest way to take care of your health.yours faithfully daniel rivers"
+      },
+      "engineered_features": {
+        "body_word_count": 92.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 15.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 4.22678383079382,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.5216406363433186,
+        "domain_length": 11.0,
+        "subject_entropy": 3.3787271036564652,
+        "body_avg_word_length": 4.869565217391305,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 1.0
+      },
+      "subject_tfidf_nonzero": [
+        [
+          1173,
+          0.5815456905814694
+        ],
+        [
+          1657,
+          0.5544232284630577
+        ],
+        [
+          1691,
+          0.5953314148495122
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          366,
+          0.1849173309263006
+        ],
+        [
+          812,
+          0.15174364892621933
+        ],
+        [
+          816,
+          0.3198479252645402
+        ],
+        [
+          830,
+          0.13807192541414684
+        ],
+        [
+          912,
+          0.15770430968424426
+        ],
+        [
+          914,
+          0.19276919265513479
+        ],
+        [
+          1124,
+          0.14838806628943857
+        ],
+        [
+          1220,
+          0.12028730190480795
+        ],
+        [
+          1243,
+          0.19869434587035384
+        ],
+        [
+          1276,
+          0.09797312313008834
+        ],
+        [
+          1277,
+          0.1610651332831225
+        ],
+        [
+          1308,
+          0.16216897434945246
+        ],
+        [
+          1456,
+          0.08722950700709113
+        ],
+        [
+          1500,
+          0.24775879420908095
+        ],
+        [
+          1502,
+          0.13783632782061617
+        ],
+        [
+          1581,
+          0.11222042010003971
+        ],
+        [
+          1738,
+          0.1640772415316554
+        ],
+        [
+          1934,
+          0.14024334676437097
+        ],
+        [
+          2092,
+          0.11581715244124326
+        ],
+        [
+          2132,
+          0.18318558039965122
+        ],
+        [
+          2135,
+          0.14183892698506295
+        ],
+        [
+          2284,
+          0.09670750876312453
+        ],
+        [
+          2546,
+          0.1387296969667875
+        ],
+        [
+          2686,
+          0.14894711843205777
+        ],
+        [
+          3299,
+          0.17452852808291677
+        ],
+        [
+          3471,
+          0.10156837920451094
+        ],
+        [
+          3601,
+          0.18698260198667724
+        ],
+        [
+          3661,
+          0.09271551269608416
+        ],
+        [
+          3725,
+          0.19151117752207256
+        ],
+        [
+          3902,
+          0.15887822595517254
+        ],
+        [
+          3941,
+          0.11245760494429348
+        ],
+        [
+          4055,
+          0.14271180869750452
+        ],
+        [
+          4439,
+          0.1819443227614742
+        ],
+        [
+          4628,
+          0.15987698328572478
+        ],
+        [
+          4720,
+          0.14669250370097528
+        ],
+        [
+          4864,
+          0.09602622892703616
+        ],
+        [
+          4871,
+          0.18722633655810736
+        ],
+        [
+          4873,
+          0.19093724442367183
+        ],
+        [
+          4988,
+          0.12785018675427834
+        ]
+      ]
+    },
+    {
+      "id": 17,
+      "label": 1,
+      "sender": "William Smith <fgreend@paradigma-software.de>",
+      "subject": "Monitors for you",
+      "body": "Confirmation of your order We present for you eshop of best digital goods We give you 20 30 discount from other shops prices! NameOther old priceOur new Price Apple iPhone 8GB 699 00 436 16Sony 42SX300 959 95 594 77Compaq Presario 430 744 00 297 39Apple iPod Video 80GB Black 338 31 218 07Canon EOS 5D Digital SLR Camera 2 649 00 1 782 38Apple iPod Digital player HD 30 GB AAC 244 99 176 00 Apple 13 3 MacBook 1 401 98 793 03Nikon D200 1 903 95 1 030 95Sony Playstation 3 Premium 790 00 416 35 Our web site bugs romping compared with overscheduled for your kids if youof Wilmette Ill he not be on par her kids friends and",
+      "normalized": {
+        "subject": "monitors for you",
+        "body": "confirmation of your order we present for you eshop of best digital goods we give you 20 30 discount from other shops prices nameother old priceour new price apple iphone 8gb 699 00 436 16sony 42sx300 959 95 594 77compaq presario 430 744 00 297 39apple ipod video 80gb black 338 31 218 07canon eos 5d digital slr camera 2 649 00 1 782 38apple ipod digital player hd 30 gb aac 244 99 176 00 apple 13 3 macbook 1 401 98 793 03nikon d200 1 903 95 1 030 95sony playstation 3 premium 790 00 416 35 our web site bugs romping compared with overscheduled for your kids if youof wilmette ill he not be on par her kids friends and"
+      },
+      "engineered_features": {
+        "body_word_count": 123.0,
+        "body_exclamation_count": 1.0,
+        "email_local_length": 7.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 4.781719235115591,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 3.614369445886757,
+        "domain_length": 21.0,
+        "subject_entropy": 3.09306920777189,
+        "body_avg_word_length": 4.056910569105691,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.7272727272727273
+      },
+      "subject_tfidf_nonzero": [
+        [
+          1104,
+          1.0
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          0,
+          0.26066361093804724
+        ],
+        [
+          74,
+          0.11107219300486038
+        ],
+        [
+          97,
+          0.09895462760033136
+        ],
+        [
+          143,
+          0.1688184455594483
+        ],
+        [
+          152,
+          0.12560518489391778
+        ],
+        [
+          156,
+          0.12994746140308075
+        ],
+        [
+          270,
+          0.20936127569505886
+        ],
+        [
+          286,
+          0.15654717533226783
+        ],
+        [
+          287,
+          0.11534878791185335
+        ],
+        [
+          479,
+          0.25062113440012673
+        ],
+        [
+          660,
+          0.08347929769762902
+        ],
+        [
+          682,
+          0.14403592100819895
+        ],
+        [
+          763,
+          0.15118279656336656
+        ],
+        [
+          809,
+          0.15439727948549387
+        ],
+        [
+          1051,
+          0.16600531701984655
+        ],
+        [
+          1094,
+          0.15467112276482475
+        ],
+        [
+          1390,
+          0.30882185379216454
+        ],
+        [
+          1407,
+          0.13642112235620998
+        ],
+        [
+          1900,
+          0.1263254180103942
+        ],
+        [
+          1924,
+          0.16076837397953964
+        ],
+        [
+          1983,
+          0.1706144885020794
+        ],
+        [
+          2085,
+          0.1644627265132408
+        ],
+        [
+          2222,
+          0.16127196549154027
+        ],
+        [
+          2359,
+          0.2823319281965733
+        ],
+        [
+          2446,
+          0.21728536416872102
+        ],
+        [
+          2703,
+          0.1812482336416144
+        ],
+        [
+          3015,
+          0.06793870688170113
+        ],
+        [
+          3115,
+          0.10701056195515528
+        ],
+        [
+          3147,
+          0.10173252243130575
+        ],
+        [
+          3193,
+          0.16322613848886294
+        ],
+        [
+          3367,
+          0.16056967013162568
+        ],
+        [
+          3445,
+          0.13173545681569873
+        ],
+        [
+          3453,
+          0.12120969646410482
+        ],
+        [
+          3471,
+          0.08846954455095776
+        ],
+        [
+          3484,
+          0.10811616005259884
+        ],
+        [
+          4089,
+          0.09625321602445523
+        ],
+        [
+          4797,
+          0.1227967553982357
+        ],
+        [
+          4871,
+          0.09631800910638777
+        ],
+        [
+          4875,
+          0.1290908115636923
+        ]
+      ]
+    },
+    {
+      "id": 18,
+      "label": 1,
+      "sender": "Jason Brady <dwedorasm@edoras.de>",
+      "subject": "re All medications to cure yourself",
+      "body": "Dear customer.Do you shop for drugs on the Web regularly? If yes read this letter to the end since it contains the information you will definitely find useful.CanadianPharmacy proves that not all cheap drugs are dangerous CanadianPharmacy is a discount Canadian pharmacy that sells real generic medications at prices much lower than those set by our USA rivals We purchase our drugs straight from the manufacturer s plant thus keeping the price low and the quality high.http canadianpharm.hk the easiest and the cheapest way to take care of your health.Best regards Jason Brady",
+      "normalized": {
+        "subject": "re all medications to cure yourself",
+        "body": "dear customer.do you shop for drugs on the web regularly if yes read this letter to the end since it contains the information you will definitely find useful.canadianpharmacy proves that not all cheap drugs are dangerous canadianpharmacy is a discount canadian pharmacy that sells real generic medications at prices much lower than those set by our usa rivals we purchase our drugs straight from the manufacturer s plant thus keeping the price low and the quality high.http canadianpharm.hk the easiest and the cheapest way to take care of your health.best regards jason brady"
+      },
+      "engineered_features": {
+        "body_word_count": 93.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 9.0,
+        "name_email_consistency": 0.0,
+        "body_url_density": 0.0,
+        "body_url_count": 0.0,
+        "body_entropy": 4.205118678682629,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.584962500721156,
+        "domain_length": 9.0,
+        "subject_entropy": 3.764735178725505,
+        "body_avg_word_length": 5.21505376344086,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 1.0
+      },
+      "subject_tfidf_nonzero": [
+        [
+          428,
+          0.7931144499265019
+        ],
+        [
+          1067,
+          0.6090726305768321
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          660,
+          0.0913656928037178
+        ],
+        [
+          662,
+          0.13263714533437695
+        ],
+        [
+          813,
+          0.1263765852112953
+        ],
+        [
+          814,
+          0.18540321171134164
+        ],
+        [
+          816,
+          0.2460059846442839
+        ],
+        [
+          830,
+          0.1316270097958842
+        ],
+        [
+          912,
+          0.1503429944458086
+        ],
+        [
+          914,
+          0.1837711202610805
+        ],
+        [
+          1124,
+          0.14146161427449036
+        ],
+        [
+          1220,
+          0.11467253620642552
+        ],
+        [
+          1242,
+          0.1709226784452757
+        ],
+        [
+          1276,
+          0.0933999377447386
+        ],
+        [
+          1277,
+          0.15354694165987748
+        ],
+        [
+          1308,
+          0.15459925767861266
+        ],
+        [
+          1407,
+          0.14930899876856402
+        ],
+        [
+          1502,
+          0.2757627111632624
+        ],
+        [
+          1581,
+          0.10698219997656894
+        ],
+        [
+          1934,
+          0.13369707363022007
+        ],
+        [
+          1937,
+          0.1739552848124199
+        ],
+        [
+          2092,
+          0.11041104419445558
+        ],
+        [
+          2132,
+          0.10314215649223123
+        ],
+        [
+          2151,
+          0.17747005559825157
+        ],
+        [
+          2192,
+          0.1629506508146776
+        ],
+        [
+          2284,
+          0.09219339967279912
+        ],
+        [
+          2437,
+          0.1568853360223013
+        ],
+        [
+          2546,
+          0.13225407791522265
+        ],
+        [
+          2678,
+          0.10994842748121648
+        ],
+        [
+          2686,
+          0.14199457100434132
+        ],
+        [
+          2768,
+          0.16826854444957073
+        ],
+        [
+          2820,
+          0.13990567820241534
+        ],
+        [
+          3300,
+          0.1378626400098355
+        ],
+        [
+          3363,
+          0.18950795251541014
+        ],
+        [
+          3471,
+          0.09682737460496398
+        ],
+        [
+          3484,
+          0.11833003078515227
+        ],
+        [
+          3582,
+          0.1303594013202247
+        ],
+        [
+          3601,
+          0.10528005945314663
+        ],
+        [
+          3661,
+          0.08838774183290624
+        ],
+        [
+          3667,
+          0.11049066445689003
+        ],
+        [
+          3711,
+          0.10645696428461676
+        ],
+        [
+          3725,
+          0.18257182670631716
+        ],
+        [
+          4026,
+          0.10480277778184593
+        ],
+        [
+          4055,
+          0.13605031279943386
+        ],
+        [
+          4289,
+          0.1708770846188089
+        ],
+        [
+          4708,
+          0.13312046699362937
+        ],
+        [
+          4720,
+          0.13984519708633458
+        ],
+        [
+          4864,
+          0.0915439205886945
+        ],
+        [
+          4871,
+          0.1054172935588779
+        ],
+        [
+          4988,
+          0.12188240102999802
+        ]
+      ]
+    },
+    {
+      "id": 19,
+      "label": 1,
+      "sender": "Joanne Gibbons <JoannewaltzElmore@worldatlas.com>",
+      "subject": "Qualitative replica watches for most exacting people",
+      "body": "Looking for qualitative watches? Go to Replica Classics One Year written replica watches warranty Most Popular Watches of All Trademarks http://nievetubaelay.com/",
+      "normalized": {
+        "subject": "qualitative replica watches for most exacting people",
+        "body": "looking for qualitative watches go to replica classics one year written replica watches warranty most popular watches of all trademarks"
+      },
+      "engineered_features": {
+        "body_word_count": 21.0,
+        "body_exclamation_count": 0.0,
+        "email_local_length": 17.0,
+        "name_email_consistency": 1.0,
+        "body_url_density": 4.761904761904762,
+        "body_url_count": 1.0,
+        "body_entropy": 4.278536472401944,
+        "email_digit_ratio": 0.0,
+        "domain_entropy": 2.9219280948873623,
+        "domain_length": 14.0,
+        "subject_entropy": 4.007287913408003,
+        "body_avg_word_length": 6.761904761904762,
+        "sender_name_exists": 1.0,
+        "subject_exclamation_count": 0.0,
+        "domain_vowel_consonant_ratio": 0.4444444444444444
+      },
+      "subject_tfidf_nonzero": [
+        [
+          613,
+          0.5471483858150251
+        ],
+        [
+          1264,
+          0.47256523747139767
+        ],
+        [
+          1394,
+          0.5178592120047996
+        ],
+        [
+          1476,
+          0.31836457867926377
+        ],
+        [
+          1936,
+          0.32829342335440836
+        ]
+      ],
+      "body_tfidf_nonzero": [
+        [
+          952,
+          0.24362742710236276
+        ],
+        [
+          2653,
+          0.1797423535112628
+        ],
+        [
+          3405,
+          0.22281934992957744
+        ],
+        [
+          3600,
+          0.2893031114406877
+        ],
+        [
+          3761,
+          0.35531018635364864
+        ],
+        [
+          3762,
+          0.24566921584096488
+        ],
+        [
+          3764,
+          0.2264495807138457
+        ],
+        [
+          4587,
+          0.30338542458345275
+        ],
+        [
+          4853,
+          0.308487865364976
+        ],
+        [
+          4858,
+          0.43240977497292316
+        ],
+        [
+          4859,
+          0.26509859318239243
+        ],
+        [
+          4959,
+          0.2345611343234267
+        ],
+        [
+          4983,
+          0.1939938739231869
+        ]
+      ]
+    }
+  ]
+}

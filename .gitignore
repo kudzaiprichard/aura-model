@@ -22,3 +22,11 @@ data/
 # Jupyter Notebooks
 .ipynb_checkpoints/
 *.ipynb_checkpoints
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Inference fixtures are tracked even though datasets/ and *.csv are not.
+!inference/tests/fixtures/
+!inference/tests/fixtures/*.json

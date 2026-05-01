@@ -1,0 +1,3 @@
+httpx>=0.27
+betacal>=1.1
+netcal>=1.4

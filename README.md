@@ -1,1184 +1,1215 @@
-# AURA - Adaptive User Risk Analyzer
+# AURA — Adaptive User Risk Analyzer
 
-[![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![ML](https://img.shields.io/badge/ML-scikit--learn-orange.svg)](https://scikit-learn.org/)
-[![Status](https://img.shields.io/badge/status-production--ready-brightgreen.svg)]()
+Phishing-email detection with three-zone confidence classification, calibrated
+probabilities, online learning, drift monitoring, and optional LLM-backed
+auto-review of uncertain predictions.
 
-**AURA** is a production-grade phishing detection system powered by machine learning with online learning capabilities. It provides real-time email classification with confidence scoring, multi-model testing, and continuous model improvement through incremental learning.
-
----
-
-## Table of Contents
-
-- [Key Features](#key-features)
-- [Architecture Overview](#architecture-overview)
-- [Dataset](#dataset)
-- [ML Development Pipeline](#ml-development-pipeline)
-- [Feature Engineering](#feature-engineering)
-- [Model Training & Selection](#model-training--selection)
-- [Model Interface Module](#model-interface-module)
-- [Project Structure](#project-structure)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage Examples](#usage-examples)
-- [Configuration](#configuration)
-- [API Reference](#api-reference)
-- [Data Flow](#data-flow)
-- [Model Information](#model-information)
-- [Contributing](#contributing)
-- [License](#license)
+The training pipeline lives in five numbered notebooks at the repository root.
+The integration surface for downstream applications is the `inference/` Python
+package. Parity between the two is enforced by a golden fixture at
+`inference/tests/fixtures/training_parity.json`.
 
 ---
 
-## Key Features
+## Contents
 
-- **Real-Time Phishing Detection** - Single and batch email classification with confidence scoring and customizable thresholds
-- **Online Learning Pipeline** - Incremental model updates without full retraining, enabling continuous improvement from user feedback
-- **Multi-Model Version Management** - Hot-swappable models with version tracking, A/B testing support, and metadata registry
-- **Production-Ready Architecture** - Stateless, thread-safe design for horizontal scaling with comprehensive error handling
-- **Advanced Feature Engineering** - 7,015 features extracted from emails (15 engineered metrics + 7,000 TF-IDF features)
-
----
-
-## Architecture Overview
-
-AURA follows a modular, pipeline-based architecture designed for scalability and maintainability.
-
-```mermaid
-graph TB
-    subgraph "Input Layer"
-        A[Email Data<br/>Sender, Subject, Body]
-    end
-
-    subgraph "Preprocessing Layer"
-        B[EmailCleaner<br/>HTML Removal, URL Preservation]
-        C[EmailFeatureExtractor<br/>7015 Features]
-    end
-
-    subgraph "Core Pipelines"
-        D[PredictionPipeline<br/>Stateless Classification]
-        E[OnlineLearningPipeline<br/>Incremental Training]
-    end
-
-    subgraph "Artifact Management"
-        F[ModelLoader<br/>Safe Model Loading]
-        G[ModelRegistry<br/>Version Management]
-    end
-
-    subgraph "Storage Layer"
-        H[(Model Artifacts<br/>v1_0, v1_1, v1_2)]
-        I[(Metadata Registry<br/>JSON)]
-        J[(TF-IDF Vectorizers<br/>Subject & Body)]
-    end
-
-    subgraph "Output Layer"
-        K[PredictionResult<br/>Label, Confidence, Alert]
-        L[OnlineLearningResult<br/>New Version, Metrics]
-    end
-
-    A --> B
-    B --> C
-    C --> D
-    C --> E
-
-    F --> D
-    F --> E
-    G --> D
-    G --> E
-
-    H --> F
-    I --> G
-    J --> C
-
-    D --> K
-    E --> L
-    E --> H
-    E --> I
-
-    style D fill:#4CAF50
-    style E fill:#2196F3
-    style G fill:#FF9800
-    style K fill:#9C27B0
-    style L fill:#9C27B0
-```
+1. [What AURA does](#1-what-aura-does)
+2. [Repository layout](#2-repository-layout)
+3. [Training data](#3-training-data)
+4. [Training pipeline](#4-training-pipeline)
+5. [Model selection and calibration](#5-model-selection-and-calibration)
+6. [Setup and installation](#6-setup-and-installation)
+7. [The `scripts/` folder](#7-the-scripts-folder)
+8. [The `inference/` package](#8-the-inference-package)
+   - [Architecture](#81-architecture)
+   - [PhishingDetector](#82-phishingdetector)
+   - [OnlineLearner](#83-onlinelearner)
+   - [ModelRegistry](#84-modelregistry)
+   - [DriftMonitor](#85-driftmonitor)
+   - [AutoReviewer](#86-autoreviewer)
+   - [Data contracts](#87-data-contracts)
+   - [Environment variables](#88-environment-variables)
+9. [Integration examples](#9-integration-examples)
+   - [Notebook / script](#91-notebook--script)
+   - [FastAPI](#92-fastapi)
+   - [Flask](#93-flask)
+   - [CLI](#94-cli)
+10. [Tests](#10-tests)
+11. [Limitations and known issues](#11-limitations-and-known-issues)
 
 ---
 
-## Dataset
+## 1. What AURA does
 
-### Dataset Sources
+AURA classifies individual emails as phishing (label `1`) or legitimate
+(label `0`). A prediction returns:
 
-AURA was trained on a comprehensive dataset combining **8 different phishing and spam email corpora**:
+- a hard label (`0` or `1`) set by a configurable probability threshold
+- a calibrated phishing probability (and the raw un-calibrated one for
+  comparison)
+- a three-zone confidence bucket (`NOT_SPAM` / `REVIEW` / `SPAM`) when zone
+  thresholds are configured
+- a UUID `prediction_id` that links the prediction to a later human
+  confirmation, enabling drift tracking
+- the 15 engineered feature values used by the model, for explainability
 
-| Dataset | Type | Description |
-|---------|------|-------------|
-| **CEAS_08** | Conference Dataset | CEAS 2008 email corpus |
-| **Nazario** | Phishing Corpus | Jose Nazario's phishing collection |
-| **Nazario_2** | Phishing Corpus | Jose Nazario's collection (variant 2) |
-| **Nazario_5** | Phishing Corpus | Jose Nazario's collection (variant 5) |
-| **Nigerian_5** | Fraud Emails | Nigerian fraud email dataset (variant 5) |
-| **Nigerian_Fraud** | Fraud Emails | Nigerian fraud email corpus |
-| **SpamAssassin** | Spam Corpus | SpamAssassin public corpus |
-| **TREC_07** | Conference Dataset | TREC 2007 spam corpus |
+The `REVIEW` zone is the integration point for `AutoReviewer`, which calls an
+LLM (Groq or Google AI Studio) to produce a structured verdict on predictions
+the model is uncertain about.
 
-### Dataset Statistics
-
-```
-Total Emails: 75,000+ samples
-Class Distribution:
-  - Phishing/Spam: ~38,000 emails (50.7%)
-  - Legitimate: ~37,000 emails (49.3%)
-
-Data Balance: Well-balanced dataset (1:1 ratio)
-Train/Test Split: 80/20 stratified split
-```
-
-### Data Processing Pipeline
-
-```mermaid
-graph LR
-    A[Raw Datasets<br/>8 CSV files] --> B[Dataset Combination]
-    B --> C[Data Exploration<br/>& Cleaning]
-    C --> D[Feature Engineering<br/>22 features]
-    D --> E[Statistical<br/>Feature Selection]
-    E --> F[TF-IDF<br/>Vectorization]
-    F --> G[Final Dataset<br/>7,015 features]
-    G --> H[Model Training]
-
-    style A fill:#e3f2fd
-    style G fill:#c8e6c9
-    style H fill:#fff9c4
-```
-
-### Email Fields
-
-Each email contains:
-- **Sender**: Email address with optional display name
-- **Subject**: Subject line text
-- **Body**: Full email body content (HTML/plain text)
-- **Label**: Binary classification (0 = Legitimate, 1 = Phishing)
+`OnlineLearner` allows the production model to be adapted with new labelled
+examples via scikit-learn's `partial_fit` without retraining from scratch.
+`DriftMonitor` tracks confirmed vs. predicted labels in an append-only JSONL
+log and signals when the false-positive rate crosses a configured threshold.
 
 ---
 
-## ML Development Pipeline
+## 2. Repository layout
 
-The AURA model was developed through a rigorous 4-phase machine learning pipeline:
-
-```mermaid
-graph TD
-    subgraph Phase1[Phase 1: Data Preparation]
-        A1[Combine 8 Datasets] --> A2[Exploratory Analysis]
-        A2 --> A3[Data Cleaning]
-        A3 --> A4[Handle Missing Values]
-    end
-
-    subgraph Phase2[Phase 2: Feature Engineering]
-        B1[Extract Email Components] --> B2[Generate 22 Features]
-        B2 --> B3[Statistical Analysis]
-        B3 --> B4[Feature Selection: 15 Features]
-        B4 --> B5[TF-IDF Vectorization]
-    end
-
-    subgraph Phase3[Phase 3: Model Training]
-        C1[Train 4 Models] --> C2[Hyperparameter Tuning]
-        C2 --> C3[Cross-Validation]
-        C3 --> C4[Performance Evaluation]
-    end
-
-    subgraph Phase4[Phase 4: Model Selection]
-        D1[Core Metrics] --> D2[Robustness Tests]
-        D2 --> D3[Bias Detection]
-        D3 --> D4[Weighted Scoring]
-        D4 --> D5[Winner Selection]
-    end
-
-    Phase1 --> Phase2
-    Phase2 --> Phase3
-    Phase3 --> Phase4
-
-    style Phase1 fill:#e3f2fd
-    style Phase2 fill:#f3e5f5
-    style Phase3 fill:#fff9c4
-    style Phase4 fill:#c8e6c9
-```
-
-### Pipeline Stages
-
-1. **Data Preparation** (`combine_dataset.ipynb`, `data_exploration_cleaning.ipynb`)
-   - Combine 8 diverse email datasets
-   - Remove duplicates and handle missing values
-   - Clean HTML, normalize whitespace
-   - Preserve phishing indicators (URLs, special characters)
-
-2. **Feature Engineering** (`feature_engenering_data_preprocessing.ipynb`)
-   - Extract sender components (name, email, domain)
-   - Generate 22 statistical features
-   - Apply TF-IDF vectorization (7,000 features)
-   - Feature selection reduces to 15 engineered features
-
-3. **Model Training** (`model_training.ipynb`)
-   - Train 4 candidate models
-   - Apply cross-validation (3-fold on subset)
-   - Hyperparameter optimization
-   - Evaluate on held-out test set
-
-4. **Model Selection**
-   - Comprehensive evaluation framework
-   - Multi-criteria weighted scoring
-   - Select production model
-
----
-
-## Feature Engineering
-
-### Feature Categories
-
-AURA uses **7,015 total features** combining engineered features with NLP-based features:
-
-```mermaid
-graph LR
-    A[Email Input] --> B[15 Engineered<br/>Features]
-    A --> C[2,000 Subject<br/>TF-IDF Features]
-    A --> D[5,000 Body<br/>TF-IDF Features]
-
-    B --> E[7,015 Total Features]
-    C --> E
-    D --> E
-
-    E --> F[ML Model]
-
-    style E fill:#4CAF50
-    style F fill:#2196F3
-```
-
-### 15 Selected Engineered Features
-
-Through statistical analysis (correlation, mutual information, ANOVA F-test, and Random Forest importance), we selected 15 high-impact features:
-
-**Sender/Email Features (8):**
-1. `email_local_length` - Length of email local part (before @)
-2. `domain_length` - Length of sender domain
-3. `email_digit_ratio` - Ratio of digits in email address
-4. `email_special_char_ratio` - Ratio of special characters in email
-5. `domain_entropy` - Shannon entropy of domain (randomness measure)
-6. `domain_vowel_consonant_ratio` - Vowel/consonant ratio in domain
-7. `sender_name_exists` - Whether sender has display name
-8. `name_email_consistency` - Consistency between name and email address
-
-**Subject Features (2):**
-9. `subject_entropy` - Shannon entropy of subject line
-10. `subject_exclamation_count` - Number of exclamation marks
-
-**Body Features (5):**
-11. `body_word_count` - Number of words in email body
-12. `body_exclamation_count` - Number of exclamation marks in body
-13. `body_url_count` - Number of URLs in email body
-14. `body_url_density` - URL count per word ratio
-15. `body_entropy` - Shannon entropy of body text
-16. `body_avg_word_length` - Average word length in body
-
-### Feature Selection Process
-
-```mermaid
-graph LR
-    A[22 Initial Features] --> B[Variance Analysis<br/>Remove Low Variance]
-    B --> C[Statistical Tests<br/>Correlation, MI, ANOVA]
-    C --> D[Redundancy Removal<br/>Correlation > 0.85]
-    D --> E[Random Forest<br/>Importance]
-    E --> F[15 Final Features<br/>Composite Scoring]
-
-    style A fill:#ffcdd2
-    style F fill:#c8e6c9
-```
-
-**Selection Criteria:**
-1. **Variance Threshold**: Remove features with variance < 0.01
-2. **Statistical Significance**:
-   - Pearson correlation with label
-   - Mutual Information score
-   - ANOVA F-test significance
-3. **Redundancy Elimination**: Remove highly correlated features (r > 0.85)
-4. **Random Forest Validation**: Verify importance rankings
-5. **Composite Scoring**: Weighted average of all metrics
-
-### TF-IDF Features
-
-**Subject TF-IDF (2,000 features):**
-- Unigrams only (single words)
-- Captures subject line keywords
-- Parameters: `max_features=2000, ngram_range=(1,1), min_df=2, max_df=0.95`
-
-**Body TF-IDF (5,000 features):**
-- Unigrams + Bigrams (phrases)
-- Captures phishing phrases like "click here", "verify account"
-- Parameters: `max_features=5000, ngram_range=(1,2), min_df=2, max_df=0.95`
-
-**Why Bigrams for Body?**
-- Phishing emails use specific phrases indicating malicious intent
-- Context matters: "verify" vs "verify account" vs "verify immediately"
-- Body text is long enough (~1000 chars avg) for meaningful bigrams
-
----
-
-## Model Training & Selection
-
-### Models Evaluated
-
-Four models were trained and comprehensively evaluated:
-
-1. **SGDClassifier (Hinge Loss)** - Linear SVM with stochastic gradient descent
-2. **Passive Aggressive Classifier** - Online learning algorithm
-3. **SGDClassifier (Log Loss)** - Logistic regression variant
-4. **MLPClassifier (Neural Network)** ⭐ **WINNER**
-
-### Model Selection Framework
-
-```mermaid
-graph TD
-    A[4 Trained Models] --> B[Core Performance<br/>Accuracy, Precision,<br/>Recall, F1, F2]
-    A --> C[Discrimination<br/>ROC-AUC, PR-AUC,<br/>Confusion Matrix]
-    A --> D[Robustness<br/>Cross-Validation,<br/>Overfitting Check,<br/>Stability Score]
-
-    B --> E[Weighted Scoring<br/>Recall: 35%<br/>F1: 25%<br/>ROC-AUC: 20%<br/>Precision: 10%<br/>Stability: 10%]
-    C --> E
-    D --> E
-
-    E --> F[Final Ranking]
-    F --> G[Winner:<br/>MLP Classifier]
-
-    style G fill:#4CAF50
-    style E fill:#FF9800
-```
-
-### Evaluation Metrics
-
-**Core Performance Metrics:**
-- Accuracy: Overall correctness
-- Precision: Minimize false alarms
-- Recall: Catch phishing emails (most critical)
-- F1 Score: Balance precision and recall
-- F2 Score: Emphasize recall over precision
-
-**Bias & Discrimination:**
-- ROC-AUC: Discrimination ability across thresholds
-- Precision-Recall AUC: Performance on imbalanced data
-- Confusion Matrix: True/false positive and negative rates
-- Class-wise Metrics: Per-class precision/recall
-
-**Robustness Tests:**
-- 3-Fold Cross-Validation: Consistency across data splits
-- Training vs Test Gap: Overfitting detection
-- Stability Score: 1 - CV standard deviation
-
-### Weighted Scoring System
-
-Models were ranked using a weighted composite score:
-
-| Metric | Weight | Rationale |
-|--------|--------|-----------|
-| **Recall** | 35% | Most critical - must catch phishing emails |
-| **F1 Score** | 25% | Balance between precision and recall |
-| **ROC-AUC** | 20% | Discrimination ability |
-| **Precision** | 10% | Minimize false alarms |
-| **Stability** | 10% | Consistency across different data |
-
-### Winner: MLP Classifier
-
-**Multi-Layer Perceptron Neural Network**
-
-**Architecture:**
-- Hidden layers: (256, 128, 64) neurons
-- Activation: ReLU
-- Solver: Adam optimizer
-- Learning rate: Adaptive (0.001 initial)
-
-**Performance:**
-- Accuracy: **99.4%**
-- Precision: **99.2%**
-- Recall: **99.6%**
-- F1 Score: **99.4%**
-- ROC-AUC: **99.9%**
-
-**Why MLP Won:**
-1. Excellent recall - catches 99.6% of phishing emails
-2. Outstanding balance - high precision with minimal false alarms
-3. Robust - consistent performance across data splits
-4. Stable - low variance in cross-validation
-5. No overfitting - minimal training/test performance gap
-
-**Online Learning Support:**
-- Supports `partial_fit()` for incremental updates
-- `warm_start=True` enables continuous learning
-- Efficient batch processing (batch_size=256)
-
----
-
-## Model Interface Module
-
-### The `phishing_detection` Module
-
-The `phishing_detection` module serves as a **production-ready interface** to the trained ML model, handling all preprocessing, feature extraction, and prediction logic transparently.
-
-```mermaid
-graph LR
-    A[Raw Email<br/>sender, subject, body] --> B[EmailCleaner<br/>HTML removal,<br/>URL preservation]
-    B --> C[EmailFeatureExtractor<br/>15 features +<br/>7000 TF-IDF]
-    C --> D[PredictionPipeline<br/>Load model,<br/>Make prediction]
-    D --> E[PredictionResult<br/>label, confidence,<br/>probabilities]
-
-    style A fill:#e3f2fd
-    style E fill:#c8e6c9
-    style D fill:#fff9c4
-```
-
-### Module Architecture
-
-**Key Principle:** Users **never interact with the raw model directly**. All data flows through the preprocessing pipeline automatically.
-
-<details>
-<summary><b>Pipeline Components (click to expand)</b></summary>
-
-1. **EmailCleaner** (`preprocessing/cleaning.py`)
-   - Removes HTML tags while preserving URLs
-   - Normalizes whitespace and special characters
-   - Preserves phishing indicators (!, ?, URLs)
-   - Handles internationalized characters
-   - **Output:** Clean text ready for feature extraction
-
-2. **EmailFeatureExtractor** (`preprocessing/features.py`)
-   - Loads pre-trained TF-IDF vectorizers
-   - Extracts 15 engineered features
-   - Applies TF-IDF transformation (7,000 features)
-   - **Output:** NumPy array of 7,015 features
-
-3. **PredictionPipeline** (`pipelines/prediction.py`)
-   - Lazy-loads ML model on first prediction
-   - Orchestrates cleaning → feature extraction → prediction
-   - Calculates confidence scores
-   - **Output:** Structured `PredictionResult` object
-
-4. **OnlineLearningPipeline** (`pipelines/training.py`)
-   - Handles incremental model updates
-   - Creates new model versions (never overwrites)
-   - Validates performance before/after training
-   - **Output:** New model version with metadata
-
-</details>
-
-### Interface Flow
-
-**For Prediction:**
-```python
-# User provides raw email
-email = {
-    'sender': 'suspicious@phish.xyz',
-    'subject': 'URGENT: Verify your account!!!',
-    'body': 'Click here immediately or account will be suspended...'
-}
-
-# Interface handles everything
-result = pipeline.predict(**email)
-
-# Behind the scenes:
-# 1. EmailCleaner.clean_email() → cleaned email
-# 2. EmailFeatureExtractor.process_email() → 7,015 features
-# 3. Model.predict() → raw prediction
-# 4. Calculate confidence, format result → PredictionResult
-```
-
-**For Training (Online Learning):**
-```python
-# User provides labeled corrections
-corrections = [
-    {'sender': '...', 'subject': '...', 'body': '...', 'label': 1},  # phishing
-    {'sender': '...', 'subject': '...', 'body': '...', 'label': 0}   # legitimate
-]
-
-# Interface handles everything
-result = training_pipeline.partial_fit_batch(corrections)
-
-# Behind the scenes:
-# 1. Validate all emails
-# 2. Clean and extract features for entire batch
-# 3. Load base model
-# 4. Apply partial_fit() with new data
-# 5. Evaluate performance before/after
-# 6. Save new model version with metadata
-```
-
-### Key Design Principles
-
-**1. Stateless Design**
-- No cached predictions or shared state
-- Each pipeline instance is independent
-- Thread-safe for concurrent requests
-
-**2. Preprocessing Transparency**
-- Users never manually clean emails or extract features
-- All preprocessing happens automatically in the pipeline
-- Consistent preprocessing guaranteed
-
-**3. Version Management**
-- Multiple model versions can coexist
-- Hot-swappable without restart
-- Centralized registry tracks all versions
-
-**4. Error Handling**
-- Comprehensive input validation
-- Graceful error messages in `PredictionResult`
-- Never crashes - always returns result object
-
-### Module Benefits
-
-✅ **Zero Data Leakage** - Preprocessing tied to pipeline, not exposed
-✅ **Reproducible** - Same preprocessing every time
-✅ **Scalable** - Stateless design enables horizontal scaling
-✅ **Maintainable** - Clear separation of concerns
-✅ **User-Friendly** - Simple API hides complexity
-
----
-
-## Project Structure
-
-<details>
-<summary>Click to expand folder structure</summary>
-
-```mermaid
-graph TD
-    ROOT[AURA_Model/]
-
-    ROOT --> NOTEBOOKS[Notebooks]
-    ROOT --> DATASETS[datasets/]
-    ROOT --> USAGE[usage/]
-
-    NOTEBOOKS --> NB1[data_exploration_cleaning.ipynb]
-    NOTEBOOKS --> NB2[feature_engenering_data_preprocessing.ipynb]
-    NOTEBOOKS --> NB3[model_training.ipynb]
-    NOTEBOOKS --> NB4[combine_dataset.ipynb]
-
-    DATASETS --> RAW[raw/]
-
-    USAGE --> USAGE_NB[usage.ipynb]
-    USAGE --> DATASET_MOD[dataset/]
-    USAGE --> PHISHING_DET[phishing_detection/]
-
-    DATASET_MOD --> DS1[legitimate.py]
-    DATASET_MOD --> DS2[phishing.py]
-    DATASET_MOD --> DS3[prepare_training_data.py]
-
-    PHISHING_DET --> USAGE_MD[USAGE.md]
-    PHISHING_DET --> ARTIFACTS[artifacts/]
-    PHISHING_DET --> PIPELINES[pipelines/]
-    PHISHING_DET --> PREPROCESS[preprocessing/]
-    PHISHING_DET --> UTILS[utils/]
-
-    ARTIFACTS --> ART1[loader.py]
-    ARTIFACTS --> ART2[registry.py]
-    ARTIFACTS --> ART3[model_metadata.json]
-    ARTIFACTS --> ART4[pipeline_components/]
-    ARTIFACTS --> ART5[v1_0/, v1_1/, v1_2/]
-
-    PIPELINES --> PIP1[base.py]
-    PIPELINES --> PIP2[prediction.py]
-    PIPELINES --> PIP3[training.py]
-
-    PREPROCESS --> PRE1[cleaning.py]
-    PREPROCESS --> PRE2[features.py]
-
-    UTILS --> UTL1[validation.py]
-    UTILS --> UTL2[metrics.py]
-
-    style PHISHING_DET fill:#4CAF50
-    style PIPELINES fill:#2196F3
-    style ARTIFACTS fill:#FF9800
-    style PREPROCESS fill:#9C27B0
-```
-
-**Directory Structure:**
 ```
 AURA_Model/
-├── README.md                                   # This file
-├── usage/
-│   ├── usage.ipynb                             # Usage demonstration
-│   ├── dataset/                                # Test data utilities
-│   │   ├── legitimate.py                       # Legitimate email samples
-│   │   ├── phishing.py                         # Phishing email samples
-│   │   └── prepare_training_data.py            # Data preparation
-│   └── phishing_detection/                     # Main module
-│       ├── USAGE.md                            # Detailed usage guide
-│       ├── artifacts/                          # Model artifacts
-│       │   ├── loader.py                       # Model loading utilities
-│       │   ├── registry.py                     # Version management
-│       │   ├── model_metadata.json             # Central registry
-│       │   ├── pipeline_components/            # Vectorizers
-│       │   └── v1_x/production/                # Model versions
-│       ├── pipelines/                          # Core pipelines
-│       │   ├── base.py                         # Shared components
-│       │   ├── prediction.py                   # Prediction pipeline
-│       │   └── training.py                     # Online learning
-│       ├── preprocessing/                      # Data preprocessing
-│       │   ├── cleaning.py                     # Email cleaning
-│       │   └── features.py                     # Feature extraction
-│       └── utils/                              # Utilities
-│           ├── validation.py                   # Input validation
-│           └── metrics.py                      # Performance metrics
-├── datasets/raw/                               # Raw email datasets
-├── data_exploration_cleaning.ipynb             # Data exploration
-├── feature_engenering_data_preprocessing.ipynb # Feature engineering
-├── model_training.ipynb                        # Model training
-└── combine_dataset.ipynb                       # Dataset combination
+├── 01.combine_dataset.ipynb               # Load and merge 8 raw CSVs
+├── 02.data_exploration_cleaning.ipynb     # EDA + text cleaning
+├── 03.feature_engenering_data_preprocessing.ipynb  # TF-IDF + feature engineering
+├── 04.model_training.ipynb                # Model competition + export
+├── 05.model_calibration.ipynb             # Post-hoc probability calibration
+│
+├── datasets/
+│   ├── raw/                 CEAS_08, Nazario (×3), Nigerian (×2), SpamAssasin, TREC_07
+│   ├── processed/           combined_dataset.csv, cleaned_email_dataset.csv
+│   ├── training/            final_dataset.csv (7015-column feature matrix)
+│   ├── calibration/         X_val.npy, y_val.npy (held out from MLP training)
+│   └── online_learning/     8 generated CSVs for model augmentation
+│
+├── models/
+│   ├── pipeline_components/ subject_vectorizer.pkl, body_vectorizer.pkl, calibrator.pkl
+│   └── v1_0/production/     phishing_detector_mlp_classifier.pkl, model_metadata.json
+│
+├── results/
+│   ├── core_metrics.csv     Per-model accuracy / precision / recall / F1
+│   ├── classwise_metrics.csv
+│   ├── robustness_metrics.csv
+│   ├── bias_metrics.csv
+│   └── final_rankings.csv
+│
+├── inference/               Python package — the primary integration surface
+│   ├── __init__.py          Re-exports every public symbol
+│   ├── detector.py          PhishingDetector
+│   ├── online_learner.py    OnlineLearner
+│   ├── drift_monitor.py     DriftMonitor + DriftSignal + DriftStatus
+│   ├── auto_reviewer.py     AutoReviewer
+│   ├── registry.py          ModelRegistry
+│   ├── preprocessing.py     Feature assembly pipeline
+│   ├── schema.py            Data contracts and enums
+│   ├── validation.py        Input validators
+│   ├── examples/            CLI, FastAPI, Flask, Jupyter demos
+│   └── tests/               Parity, unit, and integration tests
+│
+├── scripts/                 Data-generation scripts for online-learning augmentation
+└── requirements.txt         Runtime dependencies of the inference package
 ```
-
-</details>
 
 ---
 
-## Installation
+## 3. Training data
 
-### Prerequisites
+The base model was trained on the publicly available email dataset at
+**https://zenodo.org/records/8339691**.
 
-- Python 3.8 or higher
-- pip package manager
+The dataset bundles eight CSV files that are loaded individually in notebook
+`01.combine_dataset.ipynb`:
 
-### Step 1: Clone the Repository
+| File | Rows | Label distribution |
+|------|------|--------------------|
+| CEAS_08.csv | 39,154 | 21,842 phishing / 17,312 legitimate |
+| Nazario.csv | 1,565 | 1,565 phishing |
+| Nazario_2.csv | 1,565 | 1,565 phishing |
+| Nazario_5.csv | 3,065 | 1,565 phishing / 1,500 legitimate |
+| Nigerian_5.csv | 6,331 | 3,332 phishing / 2,999 legitimate |
+| Nigerian_Fraud.csv | 3,332 | 3,332 phishing |
+| SpamAssasin.csv | 5,809 | 1,718 phishing / 4,091 legitimate |
+| TREC_07.csv | 53,757 | 29,399 phishing / 24,358 legitimate |
+| **Total** | **114,578** | |
+
+All files share a common schema: `sender`, `receiver`, `date`, `subject`,
+`body`, `label`, `urls`. The `receiver`, `date`, and `urls` columns are not
+used during training.
+
+All corpora are from the 2007–2008 era. This temporal gap is the reason the
+`scripts/` folder exists — see [§7](#7-the-scripts-folder).
+
+---
+
+## 4. Training pipeline
+
+Run the five notebooks top-to-bottom in order. Each one reads artefacts
+written by the previous.
+
+### `01.combine_dataset.ipynb` — merge raw sources
+
+Loads all eight CSVs from `datasets/raw/`, inspects schema and label
+distribution per source, adds a `source_dataset` column, and concatenates into
+`datasets/processed/combined_dataset.csv` (114,578 rows × 8 columns).
+
+### `02.data_exploration_cleaning.ipynb` — EDA and text cleaning
+
+- Profiles null rates, class balance, and character encoding artefacts across
+  the combined set.
+- Applies a five-step text cleaner (`clean_encoding`) to `sender`, `subject`,
+  and `body`: HTML entity decode, U+FFFD strip, null-byte strip, whitespace
+  collapse. This is the same function re-implemented verbatim in
+  `inference/preprocessing.py`.
+- Removes duplicate rows on `(sender, subject, body)` and rows where all three
+  fields are empty.
+- Writes `datasets/processed/cleaned_email_dataset.csv`.
+
+### `03.feature_engenering_data_preprocessing.ipynb` — feature matrix
+
+Applies two transformations to the cleaned text:
+
+**TF-IDF vectorisation**
+
+`normalize_for_tfidf` is applied before vectorisation: URLs are stripped (15
+pattern set, see `inference/schema.py:URL_PATTERNS`), `!` and `?` are removed,
+text is lowercased, and whitespace is collapsed. Note this step runs *after*
+engineered features have already been computed on the un-normalised text.
+
+- Subject TF-IDF: 2,000 features (`SUBJECT_TFIDF_DIM`)
+- Body TF-IDF: 5,000 features (`BODY_TFIDF_DIM`)
+
+Both vectorisers are fitted here and serialised to
+`models/pipeline_components/subject_vectorizer.pkl` and `body_vectorizer.pkl`.
+
+**Engineered features (15)**
+
+Computed on the cleaned-but-unnormalised text in the order fixed by
+`ENGINEERED_FEATURE_ORDER` in `inference/schema.py`:
+
+| # | Feature | Description |
+|---|---------|-------------|
+| 0 | `body_word_count` | `len(body.split())` |
+| 1 | `body_exclamation_count` | Count of `!` characters |
+| 2 | `email_local_length` | Length of the local part before `@` |
+| 3 | `name_email_consistency` | 1 if sender display name shares a 3-char substring with the local part (or local part is a shared-inbox role); 0 otherwise |
+| 4 | `body_url_density` | `(url_count / word_count) × 100` |
+| 5 | `body_url_count` | Matches against all 15 URL patterns |
+| 6 | `body_entropy` | Shannon entropy of the body (excludes spaces) |
+| 7 | `email_digit_ratio` | Digit proportion of the local part |
+| 8 | `domain_entropy` | Entropy of the sender domain, dropping the TLD |
+| 9 | `domain_length` | `len(sender_domain)` |
+| 10 | `subject_entropy` | Shannon entropy of the subject (excludes spaces) |
+| 11 | `body_avg_word_length` | `sum(len(w)) / len(words)` |
+| 12 | `sender_name_exists` | 1 if display name is present in `Name <addr>` format |
+| 13 | `subject_exclamation_count` | Count of `!` in subject |
+| 14 | `domain_vowel_consonant_ratio` | Vowels / consonants in sender domain (y counts as consonant) |
+
+**Feature matrix assembly**
+
+Columns are concatenated in the fixed order `[subject_tfidf | body_tfidf | engineered]`,
+producing a 7,015-column sparse matrix per row. No scaling is applied — the
+MLP was trained on raw features.
+
+The final matrix is saved to `datasets/training/final_dataset.csv`. A
+validation/calibration partition of 14,868 rows is held out here as
+`datasets/calibration/X_val.npy` and `y_val.npy`.
+
+### `04.model_training.ipynb` — model competition and export
+
+Four scikit-learn estimators are trained on the 69,379-row training split and
+evaluated on the 14,868-row test split:
+
+| Model | Composite score | Accuracy | F1 | ROC-AUC |
+|-------|----------------|----------|----|---------|
+| **MLP_Classifier** | **0.9924** | **0.9884** | **0.9898** | **0.9988** |
+| PAC | 0.9636 | 0.9419 | 0.9511 | — |
+| SGD_Hinge | 0.9131 | 0.9113 | 0.9171 | — |
+| SGD_LogLoss | 0.7733 | 0.7778 | 0.7608 | — |
+
+The winning `MLPClassifier` has three hidden layers `(256, 128, 64)`, ReLU
+activations, Adam optimiser, adaptive learning rate starting at 0.001, L2
+penalty `α=0.005`, batch size 256, and was trained for up to 200 epochs with
+early stopping disabled (`early_stopping=False`) for deterministic export.
+
+The trained model is serialised to
+`models/v1_0/production/phishing_detector_mlp_classifier.pkl`. Full
+hyperparameters and per-split sample counts are recorded in
+`models/v1_0/production/model_metadata.json`.
+
+### `05.model_calibration.ipynb` — post-hoc probability calibration
+
+The MLP's raw probabilities are already well-calibrated (ECE 0.0103 before
+calibration) but four calibrators are compared using the held-out
+`X_val`/`y_val` partition:
+
+| Calibrator | ECE | Brier |
+|-----------|-----|-------|
+| histogram_binning | 0.00208 | 0.01217 |
+| platt_sigmoid | 0.00222 | 0.01250 |
+| isotonic | 0.00437 | 0.01119 |
+| **beta** | **0.00457** | **0.01123** |
+
+Beta calibration is selected and serialised to
+`models/pipeline_components/calibrator.pkl`. The inference module loads it
+automatically when the file exists at that path.
+
+---
+
+## 5. Model selection and calibration
+
+The production artefacts are:
+
+| File | Description |
+|------|-------------|
+| `models/v1_0/production/phishing_detector_mlp_classifier.pkl` | Fitted `MLPClassifier` |
+| `models/pipeline_components/subject_vectorizer.pkl` | Fitted `TfidfVectorizer` (2,000 features) |
+| `models/pipeline_components/body_vectorizer.pkl` | Fitted `TfidfVectorizer` (5,000 features) |
+| `models/pipeline_components/calibrator.pkl` | Beta calibrator (prob-in → prob-out) |
+
+The registry version string is `v1_0`. `ModelRegistry.active_version()` reads
+`models/model_metadata.json`; if no `active_version` is set there,
+`load_production()` falls back to the latest version by numeric order.
+
+---
+
+## 6. Setup and installation
 
 ```bash
-git clone <repository-url>
-cd AURA_Model
+git clone <repo-url> aura
+cd aura
+python -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
 ```
 
-### Step 2: Install Dependencies
+`requirements.txt` contains the runtime dependencies of the `inference/`
+package only:
+
+```
+httpx>=0.27
+betacal>=1.1
+netcal>=1.4
+```
+
+The training notebooks additionally require pandas, numpy, scikit-learn,
+joblib, scipy, matplotlib, and seaborn. Install those separately if you plan to
+re-run the training pipeline:
 
 ```bash
-pip install scikit-learn pandas numpy scipy beautifulsoup4 joblib
+pip install pandas numpy scikit-learn joblib scipy matplotlib seaborn
 ```
 
-### Step 3: Verify Installation
+The inference package tests require pytest and portalocker:
 
-```python
-from usage.phishing_detection.pipelines.prediction import PredictionPipeline
-from usage.phishing_detection.preprocessing.cleaning import EmailCleaner
-from usage.phishing_detection.preprocessing.features import EmailFeatureExtractor
-
-print("AURA installed successfully!")
+```bash
+pip install pytest portalocker
 ```
+
+**Model resolution.** `PhishingDetector.load_production()` and
+`ModelRegistry` locate the `models/` directory using the following precedence:
+
+1. `models_root` kwarg passed directly to the constructor or factory method
+2. `AURA_MODELS_DIR` environment variable
+3. `./models` relative to the working directory
 
 ---
 
-## Quick Start
+## 7. The `scripts/` folder
 
-### Basic Phishing Detection
+The training corpus (Zenodo 8339691) consists entirely of emails from
+2007–2008. The base model therefore has limited exposure to eight email
+categories that have become prevalent since then:
 
-```python
-from usage.phishing_detection.pipelines.prediction import PredictionPipeline
-from usage.phishing_detection.preprocessing.cleaning import EmailCleaner
-from usage.phishing_detection.preprocessing.features import EmailFeatureExtractor
+| Category | Type | Target rows |
+|----------|------|-------------|
+| Brand impersonation | Phishing | 700 |
+| Spear phishing | Phishing | 800 |
+| Modern-technique phishing | Phishing | 1,500 |
+| Commercial notifications | Legitimate | 1,500 |
+| Newsletters / digests | Legitimate | 700 |
+| Personal conversational | Legitimate | 1,000 |
+| Professional internal | Legitimate | 800 |
+| Retail transactional | Legitimate | 1,000 |
 
-# Initialize preprocessing components
-cleaner = EmailCleaner(verbose=False)
-extractor = EmailFeatureExtractor(
-    subject_vectorizer_path='usage/phishing_detection/artifacts/pipeline_components/subject_vectorizer.pkl',
-    body_vectorizer_path='usage/phishing_detection/artifacts/pipeline_components/body_vectorizer.pkl'
-)
+`scripts/` contains one generator and one verifier per category. Running the
+generators produces labelled CSVs in `datasets/online_learning/` that can be
+fed directly to `OnlineLearner.partial_fit_batch()` to adapt the production
+model without retraining from scratch.
 
-# Create prediction pipeline
-pipeline = PredictionPipeline(
-    model_path='usage/phishing_detection/artifacts/v1_2/production/phishing_detector_mlp_classifier.pkl',
-    cleaner=cleaner,
-    feature_extractor=extractor,
-    threshold=75.0,  # Alert if phishing probability >= 75%
-    verbose=True
-)
+### Generator scripts
 
-# Predict single email
-result = pipeline.predict(
-    sender='admin@paypa1.com',
-    subject='Urgent: Verify your account now!',
-    body='Click here to verify your account or it will be suspended.'
-)
+| Script | Label | Rows | Description |
+|--------|-------|------|-------------|
+| `gen_brand_impersonation.py` | 1 | 700 | Impersonates 8 modern SaaS brands (Teams, DocuSign, Zoom, Dropbox, WeTransfer, Notion, Slack, OpenAI) using typosquatted sender domains and fake URLs. Every row has ≥1 urgency/credential signal and 80–160 body words. |
+| `gen_spear_phishing.py` | 1 | 800 | 5 impersonation types (colleague, IT, HR, executive, vendor); uses near-real domains, internal-process references, and authority pressure. |
+| `gen_modern_technique_phishing.py` | 1 | 1,500 | 5 subtypes × 300 rows: QR-code phishing, cryptocurrency scams, AI-polished prose, callback phishing, multi-stage phishing. Structurally distinct per subtype (QR has no URL-in-body; callback forbids URLs entirely; multi-stage uses Re:/Fwd: prefixes). |
+| `gen_commercial_notifications.py` | 0 | 1,500 | Genuine-looking transactional notifications from modern e-commerce and SaaS platforms. |
+| `gen_newsletters_digests.py` | 0 | 700 | Newsletter and digest emails from realistic publisher senders. |
+| `gen_personal_conversational.py` | 0 | 1,000 | Short personal emails with varied register and salutation styles. |
+| `gen_professional_internal.py` | 0 | 800 | Internal-mail patterns: team updates, meeting requests, project status, IT announcements. |
+| `gen_retail_transactional.py` | 0 | 1,000 | Order confirmations, shipping notices, invoices, and receipts from retail brands. |
 
-print(f"Prediction: {result.predicted_label}")
-print(f"Confidence: {result.confidence_score:.2%}")
-print(f"Should Alert: {result.should_alert}")
+Each generator seeds `random` with `20260418` for reproducibility, applies a
+quality gate (word-count bounds, no URL shorteners, no real brand domains in
+phishing rows, ≥1 explicit phishing signal per row, SHA-1 deduplication), and
+raises `RuntimeError` if the target count cannot be reached within the allowed
+attempt budget.
+
+### Verifier scripts
+
+Each `verify_*.py` script reads the corresponding generated CSV and asserts the
+full quality spec: row counts, label correctness, no duplicate
+`(sender, subject, body)` triples, no URL shorteners, word-count bounds, brand
+or signal distribution constraints, and template-reuse caps. Run them after
+generation to confirm the output is clean before feeding it to `OnlineLearner`.
+
+```bash
+python scripts/gen_brand_impersonation.py
+python scripts/verify_brand_impersonation.py
+
+python scripts/gen_spear_phishing.py
+python scripts/verify_spear_phishing.py
+# ... repeat for each category
 ```
 
-**Output:**
-```
-Prediction: PHISHING
-Confidence: 87.34%
-Should Alert: True
-```
+The generated CSVs have five columns: `sender`, `subject`, `body`, `label`,
+`category`. Load them with pandas and pass each row as a dict to
+`OnlineLearner.partial_fit_batch`.
 
 ---
 
-## Usage Examples
+## 8. The `inference/` package
 
-### 1. Batch Prediction
-
-Process multiple emails efficiently:
-
-```python
-emails = [
-    ('user@bank.com', 'Account statement', 'Your monthly statement is ready.'),
-    ('noreply@secure-verify.com', 'URGENT ACTION REQUIRED!!!', 'Click to verify account now!'),
-    ('team@company.com', 'Meeting tomorrow', 'Reminder about our 10am meeting.')
-]
-
-results = pipeline.predict_batch(emails)
-
-for i, result in enumerate(results):
-    print(f"Email {i+1}: {result.predicted_label} ({result.confidence_score:.2%})")
-```
-
-### 2. Multi-Model A/B Testing
-
-Compare predictions from different model versions:
+`inference/` is the primary integration surface. Every public symbol is
+re-exported from `inference/__init__.py`:
 
 ```python
-# Load two different model versions
-pipeline_v1 = PredictionPipeline(model_path='artifacts/v1_0/production/...', ...)
-pipeline_v2 = PredictionPipeline(model_path='artifacts/v1_2/production/...', ...)
-
-# Compare results
-result_v1 = pipeline_v1.predict(sender, subject, body)
-result_v2 = pipeline_v2.predict(sender, subject, body)
-
-print(f"Model v1.0: {result_v1.predicted_label} ({result_v1.phishing_probability:.2%})")
-print(f"Model v1.2: {result_v2.predicted_label} ({result_v2.phishing_probability:.2%})")
-```
-
-### 3. Online Learning (Model Updates)
-
-Incrementally train the model with user corrections:
-
-```python
-from usage.phishing_detection.pipelines.training import OnlineLearningPipeline
-
-# Initialize training pipeline
-training_pipeline = OnlineLearningPipeline(
-    base_model_path='artifacts/v1_2/production/phishing_detector_mlp_classifier.pkl',
-    cleaner=cleaner,
-    feature_extractor=extractor,
-    output_dir='usage/phishing_detection/artifacts',
-    verbose=True
-)
-
-# Collect user corrections (false positives/negatives)
-corrections = [
-    {
-        'sender': 'newsletter@company.com',
-        'subject': 'Weekly update',
-        'body': 'Here is your weekly newsletter...',
-        'label': 0  # 0 = legitimate, 1 = phishing
-    },
-    {
-        'sender': 'verify@fake-bank.com',
-        'subject': 'Confirm your identity',
-        'body': 'Click here immediately...',
-        'label': 1  # Phishing
-    }
-]
-
-# Train on corrections
-result = training_pipeline.partial_fit_batch(
-    emails=corrections,
-    parent_version='v1_2',
-    validate=True
-)
-
-if result.success:
-    print(f"✓ New model version created: {result.version_number}")
-    print(f"✓ Emails processed: {result.emails_processed}")
-    print(f"✓ Performance before: {result.performance_before}")
-    print(f"✓ Performance after: {result.performance_after}")
-```
-
-### 4. Model Version Management
-
-```python
-from usage.phishing_detection.artifacts.registry import ModelRegistry
-
-registry = ModelRegistry(
-    models_dir='usage/phishing_detection/artifacts',
-    metadata_path='usage/phishing_detection/artifacts/model_metadata.json'
-)
-
-# Get active production model
-active_version = registry.get_active_version()
-print(f"Active model: {active_version}")
-
-# List all available versions
-versions = registry.list_versions()
-print(f"Available versions: {versions}")
-
-# Get detailed version info
-info = registry.get_version_info('v1_2')
-print(f"Version info: {info}")
-
-# Set new model as active
-registry.set_active_model('v1_3')
-```
-
----
-
-## Configuration
-
-### Default Constants
-
-```python
-# Detection threshold (0-1 or 0-100)
-DEFAULT_THRESHOLD = 0.75  # 75% phishing probability triggers alert
-
-# Feature dimensions
-FEATURE_COUNT = 7015      # 15 engineered + 2000 subject + 5000 body TF-IDF
-
-# Classification labels
-VALID_LABELS = [0, 1]     # 0 = legitimate, 1 = phishing
-
-# Batch processing limits
-MIN_BATCH_SIZE = 1
-MAX_BATCH_SIZE = 10000
-
-# Email validation
-MIN_BODY_LENGTH = 10      # Minimum cleaned body length (characters)
-```
-
-### Custom Threshold Configuration
-
-Adjust sensitivity based on your use case:
-
-```python
-# High security (stricter, more false positives)
-pipeline_strict = PredictionPipeline(..., threshold=0.50)  # 50% threshold
-
-# Balanced (recommended for production)
-pipeline_balanced = PredictionPipeline(..., threshold=0.75)  # 75% threshold
-
-# Permissive (fewer false positives, might miss some phishing)
-pipeline_permissive = PredictionPipeline(..., threshold=0.90)  # 90% threshold
-```
-
-### Model Artifact Structure
-
-```
-artifacts/
-├── model_metadata.json                      # Central version registry
-├── pipeline_components/
-│   ├── subject_vectorizer.pkl               # TF-IDF for subject lines
-│   └── body_vectorizer.pkl                  # TF-IDF for email bodies
-├── v1_0/
-│   └── production/
-│       └── phishing_detector_mlp_classifier.pkl
-├── v1_1/
-│   └── production/
-│       └── phishing_detector_mlp_classifier.pkl
-└── v1_2/
-    └── production/
-        └── phishing_detector_mlp_classifier.pkl
-```
-
----
-
-## API Reference
-
-<details>
-<summary>PredictionPipeline API</summary>
-
-### `PredictionPipeline`
-
-**Constructor:**
-```python
-PredictionPipeline(
-    model_path: str,
-    cleaner: EmailCleaner,
-    feature_extractor: EmailFeatureExtractor,
-    threshold: float = 75.0,
-    verbose: bool = False
+from inference import (
+    PhishingDetector,
+    OnlineLearner,
+    ModelRegistry,
+    DriftMonitor,
+    DriftSignal,
+    DriftStatus,
+    AutoReviewer,
+    AutoReviewSuccess,
+    AutoReviewFailure,
+    AutoReviewResponse,
+    LLMProvider,
+    ReviewLabel,
+    PredictionResult,
+    OnlineLearningResult,
+    ConfidenceZone,
+    ValidationError,
 )
 ```
 
-**Methods:**
+### 8.1 Architecture
 
-#### `predict(sender, subject, body) -> PredictionResult`
-Classify a single email.
+```
+inference/
+├── detector.py        PhishingDetector — predict / predict_batch / predict_safe
+├── online_learner.py  OnlineLearner — partial_fit_batch + promotion gating
+├── drift_monitor.py   DriftMonitor — append-only JSONL FPR tracking
+├── auto_reviewer.py   AutoReviewer — Groq / Google AI Studio over direct HTTP
+├── registry.py        ModelRegistry — versioned artefact layout + integrity checks
+├── preprocessing.py   Feature assembly: clean_encoding, normalize_for_tfidf,
+│                      extract_engineered_features, build_feature_row,
+│                      build_feature_matrix
+├── schema.py          Data contracts: PredictionResult, OnlineLearningResult,
+│                      DriftSignal, AutoReviewSuccess/Failure, enums, constants
+├── validation.py      validate_email_inputs, validate_threshold,
+│                      validate_review_thresholds, validate_training_batch
+├── examples/
+│   ├── cli.py              python -m inference.examples.cli
+│   ├── fastapi_app.py      uvicorn inference.examples.fastapi_app:app
+│   ├── flask_app.py        flask --app inference.examples.flask_app run
+│   ├── demo_auto_reviewer.py
+│   ├── demo_predict.ipynb
+│   ├── demo_online_learning.ipynb
+│   └── demo_drift_monitor.ipynb
+└── tests/
+    ├── test_parity.py                 Parity against training fixture
+    ├── test_detector.py
+    ├── test_preprocessing.py
+    ├── test_registry.py
+    ├── test_drift_monitor.py
+    ├── test_auto_reviewer.py
+    ├── test_calibrator_distinct_outputs.py
+    └── fixtures/
+        ├── training_parity.json       Golden reference: 20+ email records
+        └── _generate_fixture.py       Re-generate the fixture from notebook output
+```
 
-**Parameters:**
-- `sender` (str): Email sender address
-- `subject` (str): Email subject line
-- `body` (str): Email body content
+### 8.2 PhishingDetector
 
-**Returns:** `PredictionResult` with fields:
-- `predicted_label` (str): 'PHISHING' or 'LEGITIMATE'
-- `confidence_score` (float): 0.0-1.0 confidence
-- `phishing_probability` (float): 0.0-1.0 probability
-- `legitimate_probability` (float): 0.0-1.0 probability
-- `should_alert` (bool): Whether to trigger alert
-- `threshold_used` (float): Applied threshold
-- `raw_prediction` (int): 0 or 1
-- `error` (str): Error message if failed
+The main entry point for prediction. Stateless and thread-safe when
+instantiated once per thread.
 
-#### `predict_batch(emails) -> List[PredictionResult]`
-Classify multiple emails.
+#### Construction
 
-**Parameters:**
-- `emails` (List[Tuple[str, str, str]]): List of (sender, subject, body) tuples
+**`PhishingDetector.load_production(models_root=None)`**
 
-**Returns:** List of `PredictionResult` objects
+Loads the active version from the registry, or the latest version if no active
+version is set. Automatically loads the calibrator from
+`pipeline_components/calibrator.pkl` if it exists.
 
-#### `get_model_info() -> ModelInfo`
-Get information about the loaded model.
-
-**Returns:** `ModelInfo` with model metadata
-
-#### `reload_model()`
-Reload the model from disk (for hot-swapping).
-
-</details>
-
-<details>
-<summary>OnlineLearningPipeline API</summary>
-
-### `OnlineLearningPipeline`
-
-**Constructor:**
 ```python
-OnlineLearningPipeline(
-    base_model_path: str,
-    cleaner: EmailCleaner,
-    feature_extractor: EmailFeatureExtractor,
-    output_dir: str = './artifacts',
-    verbose: bool = False
+detector = PhishingDetector.load_production()
+detector = PhishingDetector.load_production(models_root='/srv/models')
+```
+
+**`PhishingDetector.load(version, models_root=None)`**
+
+Loads a specific registered version.
+
+```python
+detector = PhishingDetector.load('v1_0')
+```
+
+**`PhishingDetector.from_paths(model_path, subject_vectorizer_path, body_vectorizer_path, *, calibrator_path=None, review_low_threshold=None, review_high_threshold=None, drift_monitor=None)`**
+
+Loads artefacts from explicit paths. Use when you manage paths yourself or need
+to override specific files.
+
+```python
+detector = PhishingDetector.from_paths(
+    model_path='models/v1_0/production/phishing_detector_mlp_classifier.pkl',
+    subject_vectorizer_path='models/pipeline_components/subject_vectorizer.pkl',
+    body_vectorizer_path='models/pipeline_components/body_vectorizer.pkl',
+    calibrator_path='models/pipeline_components/calibrator.pkl',
+    review_low_threshold=0.3,
+    review_high_threshold=0.8,
 )
 ```
 
-**Methods:**
+**Constructor kwargs**
 
-#### `partial_fit_batch(emails, parent_version, validate=True) -> OnlineLearningResult`
-Train model incrementally on new labeled data.
+| Kwarg | Type | Default | Description |
+|-------|------|---------|-------------|
+| `calibrator` | prob-in/prob-out object | `None` | Applied via `.transform([raw_prob])` or `.predict([raw_prob])`. Classifier-style calibrators (`predict_proba`) are rejected at inference time. |
+| `review_low_threshold` | float in [0, 1] | `None` | Lower REVIEW-zone boundary. Must be set together with `review_high_threshold`. |
+| `review_high_threshold` | float in [0, 1] | `None` | Upper REVIEW-zone boundary. Must satisfy `low < high`. |
+| `drift_monitor` | `DriftMonitor` | `None` | When set, every `predict()` and `predict_batch()` call automatically records the prediction via `record_prediction`. |
 
-**Parameters:**
-- `emails` (List[Dict]): List of dicts with keys: sender, subject, body, label
-- `parent_version` (str): Base model version (e.g., 'v1_0')
-- `validate` (bool): Whether to validate performance before/after
+Both review thresholds must be provided together or both omitted — partial
+configuration raises `ValidationError`.
 
-**Returns:** `OnlineLearningResult` with fields:
-- `success` (bool): Training success status
-- `version_number` (str): New version created (e.g., 'v1_3')
-- `emails_processed` (int): Count of processed emails
-- `performance_before` (Dict): Metrics before training
-- `performance_after` (Dict): Metrics after training
-- `timestamp` (str): ISO timestamp
-- `model_files` (Dict): Paths to saved artifacts
+#### Zone classification
 
-#### `get_status() -> TrainingStatus`
-Get current training status.
-
-**Returns:** `TrainingStatus` with progress information
-
-</details>
-
-<details>
-<summary>EmailCleaner API</summary>
-
-### `EmailCleaner`
-
-**Constructor:**
-```python
-EmailCleaner(verbose: bool = False)
+```
+phishing_probability < review_low_threshold   → ConfidenceZone.NOT_SPAM
+review_low_threshold ≤ probability < high     → ConfidenceZone.REVIEW
+probability ≥ review_high_threshold           → ConfidenceZone.SPAM
 ```
 
-**Methods:**
+Exact boundaries bucket upward, consistent with `int(prob >= threshold)` for
+`predicted_label`. Zone classification requires both thresholds to be set;
+otherwise `confidence_zone` is `None`.
 
-#### `clean_email(sender, subject, body) -> Dict`
-Clean all email fields.
+#### Prediction methods
 
-**Returns:** Dict with keys: sender, subject, body, urls (0/1)
+**`predict(sender, subject, body, *, threshold=0.75) → PredictionResult`**
 
-#### `clean_sender(sender) -> str`
-Clean sender email address.
+Single-email prediction. Raises `ValidationError` if `sender`, `subject`, or
+`body` is not a string, or if all three are empty, or if `threshold` is outside
+[0, 1].
 
-#### `clean_subject(subject) -> str`
-Clean subject line while preserving phishing indicators.
-
-#### `clean_body(body) -> str`
-Clean email body while preserving URLs and indicators.
-
-</details>
-
-<details>
-<summary>EmailFeatureExtractor API</summary>
-
-### `EmailFeatureExtractor`
-
-**Constructor:**
 ```python
-EmailFeatureExtractor(
-    subject_vectorizer_path: str,
-    body_vectorizer_path: str,
-    verbose: bool = False
+result = detector.predict(
+    sender='"PayPal Security" <service@paypa1-alerts.com>',
+    subject='URGENT: verify your account',
+    body='Click http://paypa1-alerts.com/verify to avoid suspension.',
+    threshold=0.75,
+)
+
+print(result.predicted_label)          # 0 or 1
+print(result.phishing_probability)     # calibrated probability
+print(result.raw_phishing_probability) # uncalibrated probability
+print(result.confidence_zone)          # ConfidenceZone enum or None
+print(result.prediction_id)            # UUID4 string
+print(result.engineered_features)      # dict with 15 keys
+print(result.to_dict())               # JSON-serialisable dict
+```
+
+**`predict_safe(sender, subject, body, *, threshold=0.75) → dict`**
+
+Never raises. Returns `result.to_dict()` on success, or an error envelope on
+failure:
+
+```python
+payload = detector.predict_safe(sender, subject, body)
+if 'error' in payload:
+    # {'error': 'validation_error' | 'internal_error', 'message': '...'}
+    log.warning(payload['message'])
+else:
+    process(payload)
+```
+
+**`predict_batch(emails, *, threshold=0.75) → list[PredictionResult]`**
+
+Processes all emails in a single vectorised forward pass. Each email must be a
+dict with `sender`, `subject`, and `body` string fields.
+
+```python
+results = detector.predict_batch(
+    [
+        {'sender': s1, 'subject': sb1, 'body': b1},
+        {'sender': s2, 'subject': sb2, 'body': b2},
+    ],
+    threshold=0.5,
 )
 ```
 
-**Methods:**
+#### `PredictionResult` fields
 
-#### `process_email(cleaned_email) -> np.ndarray`
-Extract 7,015 features from cleaned email.
-
-**Parameters:**
-- `cleaned_email` (Dict): Output from `EmailCleaner.clean_email()`
-
-**Returns:** NumPy array of shape (7015,) containing:
-- 15 engineered features
-- 2,000 TF-IDF features from subject
-- 5,000 TF-IDF features from body
-
-</details>
-
----
-
-## Data Flow
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant Pipeline as PredictionPipeline
-    participant Cleaner as EmailCleaner
-    participant Extractor as FeatureExtractor
-    participant Model as MLPClassifier
-    participant Output as PredictionResult
-
-    User->>Pipeline: predict(sender, subject, body)
-    Pipeline->>Cleaner: clean_email(sender, subject, body)
-    Cleaner-->>Pipeline: cleaned_email
-    Pipeline->>Extractor: process_email(cleaned_email)
-    Extractor->>Extractor: Extract 15 engineered features
-    Extractor->>Extractor: TF-IDF vectorization (7000 features)
-    Extractor-->>Pipeline: feature_vector (7015 dims)
-    Pipeline->>Model: predict_proba(feature_vector)
-    Model-->>Pipeline: [prob_legitimate, prob_phishing]
-    Pipeline->>Pipeline: Calculate confidence & alert
-    Pipeline->>Output: Create PredictionResult
-    Output-->>User: Return result
+```
+predicted_label:            int            0 or 1
+phishing_probability:       float          calibrated (or raw if no calibrator)
+legitimate_probability:     float          1 - phishing_probability (when calibrated)
+threshold:                  float          threshold used for this prediction
+model_version:              str | None     version string from registry
+engineered_features:        dict[str, float]   15 keys in ENGINEERED_FEATURE_ORDER
+raw_phishing_probability:   float | None   pre-calibration value
+raw_legitimate_probability: float | None   pre-calibration value
+calibrated:                 bool
+confidence_zone:            ConfidenceZone | None
+review_low_threshold:       float | None
+review_high_threshold:      float | None
+prediction_id:              str | None     UUID4; None only when drift_monitor absent
 ```
 
-**Training Data Flow:**
+`to_dict()` converts `confidence_zone` to its string value
+(`'SPAM'`, `'NOT_SPAM'`, `'REVIEW'`).
 
-```mermaid
-graph LR
-    A[User Corrections] -->|labeled data| B[OnlineLearningPipeline]
-    B --> C[Load Base Model]
-    B --> D[Preprocess Batch]
-    C --> E[Validate Before]
-    D --> E
-    E --> F[partial_fit]
-    F --> G[Validate After]
-    G --> H{Performance OK?}
-    H -->|Yes| I[Save New Version]
-    H -->|No| J[Reject Update]
-    I --> K[Update Metadata]
-    K --> L[Return OnlineLearningResult]
+### 8.3 OnlineLearner
 
-    style I fill:#4CAF50
-    style J fill:#f44336
+Adapts the production model with new labelled examples using scikit-learn's
+`partial_fit`. Cross-process writes are serialised via a `portalocker` exclusive
+lock on `{models_root}/.lock`.
+
+**Not thread-safe for shared instances.** Use one `OnlineLearner` per thread.
+
+#### Construction
+
+```python
+from inference import OnlineLearner
+import pandas as pd
+import numpy as np
+
+learner = OnlineLearner(
+    models_root='./models',
+    holdout_set=(holdout_df, y_holdout),  # optional
+    oov_warn_threshold=0.30,               # default
+)
+```
+
+| Kwarg | Type | Default | Description |
+|-------|------|---------|-------------|
+| `registry` | `ModelRegistry` | `None` | If `None`, constructed from `models_root`. |
+| `models_root` | Path / str | `None` | Used when `registry` is `None`. Falls back to `AURA_MODELS_DIR` then `./models`. |
+| `holdout_set` | `(DataFrame, ndarray)` | `None` | If provided, before/after metrics are computed on this set. Without it, `performance_before` and `performance_after` in the result are empty dicts. |
+| `oov_warn_threshold` | float | `0.30` | Fraction of tokens outside the training vocabulary that triggers a `log.warning`. |
+
+#### `partial_fit_batch(emails, *, source_version=None, max_iter_per_call=5) → OnlineLearningResult`
+
+`emails` is a list of dicts, each with `sender`, `subject`, `body` (str) and
+`label` (int, 0 or 1). Both classes must be present in the batch
+(`min_per_class=1`).
+
+`max_iter_per_call` caps the number of `partial_fit` iterations per call
+(default 5). `early_stopping` is forced to `False` on the copy before fitting.
+
+The method:
+1. Acquires the portalocker write lock.
+2. Loads the source version (active → latest → specified).
+3. Measures before-metrics on the holdout set.
+4. Computes OOV rates for subject and body.
+5. Calls `partial_fit` up to `max_iter_per_call` times.
+6. Measures after-metrics.
+7. Registers the new version via `ModelRegistry.register_new_version`.
+8. Returns an `OnlineLearningResult` with `promoted=False`.
+
+The new version is **not promoted** automatically. Review the metrics and call
+`promote()` explicitly.
+
+```python
+result = learner.partial_fit_batch(
+    emails=[
+        {'sender': s, 'subject': sb, 'body': b, 'label': y}
+        for s, sb, b, y in training_data
+    ],
+    max_iter_per_call=5,
+)
+print(result.new_version)             # e.g. 'v1_1'
+print(result.performance_before)      # {'accuracy': ..., 'f1': ..., ...}
+print(result.performance_after)       # same keys
+print(result.oov_rate_subject)        # fraction of subject tokens OOV
+```
+
+#### `promote(version, *, min_delta_f1=-0.01) → None`
+
+Promotes a registered version to active. Refuses if the F1 delta
+`(after - before)` is below `min_delta_f1`.
+
+```python
+learner.promote(result.new_version, min_delta_f1=-0.01)
+```
+
+#### `OnlineLearningResult` fields
+
+```
+new_version:          str     registered version string (e.g. 'v1_1')
+source_version:       str     version that was fine-tuned
+batch_size:           int
+iterations:           int     actual partial_fit calls made
+performance_before:   dict    accuracy/precision/recall/f1 on holdout (or {})
+performance_after:    dict    same
+oov_rate_subject:     float
+oov_rate_body:        float
+promoted:             bool    always False from partial_fit_batch
+```
+
+### 8.4 ModelRegistry
+
+Manages the versioned artefact layout on disk:
+
+```
+<models_root>/
+    pipeline_components/
+        subject_vectorizer.pkl
+        body_vectorizer.pkl
+        calibrator.pkl               # optional
+    v<major>_<minor>/production/
+        phishing_detector_mlp_classifier.pkl
+        model_metadata.json
+    model_metadata.json              # registry-level: active_version + versions dict
+```
+
+#### Key methods
+
+| Method | Returns | Description |
+|--------|---------|-------------|
+| `list_versions()` | `list[str]` | All valid versions with a model file, sorted by `(major, minor)` |
+| `active_version()` | `str \| None` | Value of `active_version` in the registry metadata |
+| `latest_version()` | `str \| None` | Last item from `list_versions()` |
+| `paths_for(version)` | `dict[str, Path \| None]` | Resolved paths for `model`, `subject_vectorizer`, `body_vectorizer`, `calibrator` |
+| `set_active(version, *, verify_integrity=True)` | `None` | Sets `active_version`; verifies SHA-256 by default |
+| `promote(version, metrics)` | `None` | Sets `promoted=True` and writes metrics in the registry JSON |
+| `register_new_version(model, source_version, metrics=None, *, calibrator_path=None)` | `str` | Serialises the model, computes SHA-256, bumps the minor version, writes registry JSON |
+
+`register_new_version` increments the minor number within the same major:
+source `v1_0` → new `v1_1`, source `v1_3` → new `v1_4`. All JSON writes are
+atomic (temp file + `os.replace`).
+
+```python
+from inference import ModelRegistry
+
+registry = ModelRegistry('./models')
+print(registry.list_versions())    # ['v1_0']
+print(registry.active_version())   # None or 'v1_0'
+registry.set_active('v1_0')
+```
+
+### 8.5 DriftMonitor
+
+Tracks prediction vs. confirmation pairs in an append-only JSONL log.
+Reconstructs its in-memory confusion matrix from the log on construction, so it
+survives process restarts. Cross-process writes are serialised via portalocker
+on the log file itself.
+
+**Not thread-safe for shared instances.** Use one per thread.
+
+#### Construction
+
+```python
+from inference import DriftMonitor
+
+monitor = DriftMonitor(
+    log_path='logs/drift.jsonl',
+    fpr_threshold=0.10,          # default
+)
+```
+
+| Kwarg | Type | Default | Description |
+|-------|------|---------|-------------|
+| `log_path` | str / Path | required | Created if missing. Replayed on construction. |
+| `fpr_threshold` | float in [0, 1] | `0.10` | FPR level at which `drift_signal().status` becomes `WARNING`. |
+
+#### Methods
+
+**`record_prediction(prediction_id, predicted_label, predicted_probability, model_version, timestamp=None)`**
+
+Called automatically by `PhishingDetector` when a `DriftMonitor` is attached.
+Can also be called manually.
+
+**`record_confirmation(prediction_id, confirmed_label, timestamp=None)`**
+
+Links a true label to a previously recorded prediction. Raises `ValueError` on
+an unknown or duplicate `prediction_id`.
+
+**`confusion_matrix() → dict`**
+
+Returns `{'tp': int, 'tn': int, 'fp': int, 'fn': int}` from confirmed pairs
+only.
+
+**`false_positive_rate() → float`**
+
+`fp / (fp + tn)`. Returns `0.0` when no negatives have been confirmed yet.
+
+**`drift_signal() → DriftSignal`**
+
+```python
+signal = monitor.drift_signal()
+print(signal.status)            # 'OK' or 'WARNING'
+print(signal.false_positive_rate)
+print(signal.total_predictions)
+print(signal.confirmed_predictions)
+print(signal.threshold)
+print(signal.message)
+print(signal.to_dict())
+```
+
+#### JSONL record formats
+
+```json
+{"type": "prediction",   "prediction_id": "<uuid4>", "predicted_label": 1,
+ "predicted_probability": 0.91, "model_version": "v1_0",
+ "timestamp": "2026-04-18T07:00:00+00:00"}
+
+{"type": "confirmation", "prediction_id": "<uuid4>", "confirmed_label": 1,
+ "timestamp": "2026-04-18T08:00:00+00:00"}
+```
+
+See `inference/examples/demo_drift_monitor.ipynb` for a full simulation
+including restart-and-replay.
+
+### 8.6 AutoReviewer
+
+LLM-backed adjudicator for `REVIEW`-zone predictions. Calls Groq or Google AI
+Studio over direct HTTP (no provider SDKs). Never raises — all failures are
+captured as `AutoReviewFailure`.
+
+#### Construction
+
+```python
+from inference import AutoReviewer, LLMProvider
+
+reviewer = AutoReviewer(
+    provider=LLMProvider.GROQ,
+    api_key='gsk_...',
+    model_name=None,           # default: 'llama-3.3-70b-versatile'
+    timeout_seconds=30.0,
+    max_retries=2,
+)
+```
+
+| Kwarg | Type | Default | Description |
+|-------|------|---------|-------------|
+| `provider` | `LLMProvider` | required | `LLMProvider.GROQ` or `LLMProvider.GOOGLE` |
+| `api_key` | non-empty str | required | Provider API key |
+| `model_name` | str \| None | per-provider | Groq: `llama-3.3-70b-versatile`; Google: `gemini-3-flash-preview` |
+| `timeout_seconds` | float > 0 | `30.0` | Per-request HTTP timeout |
+| `max_retries` | int ≥ 0 | `2` | Retries on 5xx and transport errors only. 4xx fails fast. |
+| `http_client` | `httpx.Client \| None` | `None` | Injectable for testing. Owned and closed internally when `None`. |
+
+#### Methods
+
+**`review(sender, subject, body, engineered_features=None) → AutoReviewResponse`**
+
+Calls the LLM and returns either `AutoReviewSuccess` or `AutoReviewFailure`.
+Never raises.
+
+The LLM is prompted to reply with a JSON object:
+
+```json
+{
+  "label": "PHISHING" | "LEGITIMATE" | "UNCERTAIN",
+  "confidence": "high" | "medium" | "low",
+  "reasoning": "<one or two sentences>"
+}
+```
+
+When `engineered_features` is provided, four signals are appended to the prompt
+as supporting context (not primary evidence): `body_url_count`,
+`body_url_density`, `name_email_consistency`, `domain_entropy`.
+
+```python
+response = reviewer.review(sender, subject, body)
+if isinstance(response, AutoReviewSuccess):
+    print(response.review_label)   # ReviewLabel enum: PHISHING/LEGITIMATE/UNCERTAIN
+    print(response.reasoning)
+    print(response.confidence)     # 'high', 'medium', or 'low'
+    print(response.provider)       # LLMProvider enum
+    print(response.model_name)
+else:
+    # AutoReviewFailure
+    print(response.user_message)   # safe to show to end users
+    print(response.technical_error)  # for logs
+```
+
+**`review_if_uncertain(prediction_result, sender, subject, body) → AutoReviewResponse | None`**
+
+Returns `None` when `prediction_result.confidence_zone` is not
+`ConfidenceZone.REVIEW` — no LLM call is made. When the zone is `REVIEW`, calls
+`review()` with `engineered_features=prediction_result.engineered_features`.
+
+```python
+result = detector.predict(sender, subject, body)
+review = reviewer.review_if_uncertain(result, sender, subject, body)
+if review is not None and isinstance(review, AutoReviewSuccess):
+    if review.review_label == ReviewLabel.PHISHING:
+        quarantine(email)
+```
+
+#### `AutoReviewSuccess` fields
+
+```
+review_label:   ReviewLabel     PHISHING | LEGITIMATE | UNCERTAIN
+reasoning:      str
+confidence:     str             'high' | 'medium' | 'low' (LLM-reported)
+provider:       LLMProvider
+model_name:     str
+raw_response:   dict | None     full parsed LLM response
+```
+
+`to_dict()` adds `'outcome': 'success'` and serialises enums to strings.
+
+#### `AutoReviewFailure` fields
+
+```
+user_message:     str    short, non-technical message safe to show to end users
+technical_error:  str    raw upstream error (status codes, JSON fragments)
+provider:         LLMProvider
+model_name:       str
+raw_response:     dict | None
+```
+
+`to_dict()` adds `'outcome': 'failure'`.
+
+Retry behaviour: 5xx responses and transport errors (`httpx.TimeoutException`,
+`httpx.HTTPError`) are retried up to `max_retries` times. 4xx responses
+(including 401, 403, 429) are not retried. User-friendly messages are generated
+per HTTP status:
+
+| Status | `user_message` |
+|--------|----------------|
+| 401 / 403 | Authentication or permission problem |
+| 429 | Rate-limited or over quota |
+| 5xx | Temporarily unavailable |
+| timeout | Did not respond in time |
+
+See `inference/examples/demo_auto_reviewer.py` for a live end-to-end demo.
+
+### 8.7 Data contracts
+
+All data types are importable from `inference.schema` or directly from
+`inference`.
+
+#### Enums
+
+```python
+class ConfidenceZone(str, Enum):
+    SPAM     = 'SPAM'
+    NOT_SPAM = 'NOT_SPAM'
+    REVIEW   = 'REVIEW'
+
+class DriftStatus(str, Enum):
+    OK      = 'OK'
+    WARNING = 'WARNING'
+
+class LLMProvider(str, Enum):
+    GROQ   = 'groq'
+    GOOGLE = 'google'
+
+class ReviewLabel(str, Enum):
+    PHISHING   = 'PHISHING'
+    LEGITIMATE = 'LEGITIMATE'
+    UNCERTAIN  = 'UNCERTAIN'
+```
+
+All four inherit from `str` and serialise cleanly to JSON.
+
+#### Constants (from `inference.schema`)
+
+```python
+SUBJECT_TFIDF_DIM       = 2000
+BODY_TFIDF_DIM          = 5000
+ENGINEERED_DIM          = 15
+TOTAL_FEATURES          = 7015    # SUBJECT_TFIDF_DIM + BODY_TFIDF_DIM + ENGINEERED_DIM
+
+ENGINEERED_FEATURE_ORDER: tuple[str, ...]   # 15 feature names, fixed training order
+URL_PATTERNS: tuple[str, ...]               # 15 URL regex patterns used by count_urls
+```
+
+#### `ValidationError`
+
+Raised by all input validators: `validate_email_inputs`, `validate_threshold`,
+`validate_review_thresholds`, `validate_training_batch`. Raised by
+`PhishingDetector.__init__` on invalid threshold pairs, and by
+`predict()`/`predict_batch()` on bad inputs. `predict_safe()` converts it to
+`{'error': 'validation_error', 'message': '...'}`.
+
+### 8.8 Environment variables
+
+Both the FastAPI and Flask example apps read the same environment. The
+`default_models_root()` function in `inference/registry.py` uses these when no
+`models_root` argument is passed.
+
+| Variable | Used by | Effect |
+|----------|---------|--------|
+| `AURA_MODELS_DIR` | `ModelRegistry`, `default_models_root()` | Overrides the default `./models` path |
+| `AURA_CALIBRATOR_PATH` | Example apps | Overrides the calibrator path from the registry |
+| `AURA_REVIEW_LOW` | Example apps | Lower REVIEW-zone threshold (float) |
+| `AURA_REVIEW_HIGH` | Example apps | Upper REVIEW-zone threshold (float) |
+| `AURA_DRIFT_LOG` | Example apps | JSONL path; enables `/drift` endpoint |
+| `AURA_REVIEW_PROVIDER` | Example apps | `'groq'` or `'google'`; enables AutoReviewer |
+| `AURA_REVIEW_API_KEY` | Example apps | API key for the selected provider |
+
+---
+
+## 9. Integration examples
+
+### 9.1 Notebook / script
+
+**Minimal — load production model, single prediction**
+
+```python
+from inference import PhishingDetector
+
+detector = PhishingDetector.load_production()
+result = detector.predict(
+    sender='"PayPal Security" <service@paypa1-alerts.com>',
+    subject='URGENT: verify your account',
+    body='Click http://paypa1-alerts.com/verify within 24 hours.',
+)
+print(result.predicted_label, result.phishing_probability)
+```
+
+**With calibrator and three-zone classification**
+
+```python
+from inference import PhishingDetector, ConfidenceZone
+
+detector = PhishingDetector.from_paths(
+    model_path='models/v1_0/production/phishing_detector_mlp_classifier.pkl',
+    subject_vectorizer_path='models/pipeline_components/subject_vectorizer.pkl',
+    body_vectorizer_path='models/pipeline_components/body_vectorizer.pkl',
+    calibrator_path='models/pipeline_components/calibrator.pkl',
+    review_low_threshold=0.3,
+    review_high_threshold=0.8,
+)
+
+result = detector.predict(sender, subject, body)
+if result.confidence_zone == ConfidenceZone.REVIEW:
+    # route to manual or LLM review
+    ...
+```
+
+**Batch prediction**
+
+```python
+results = detector.predict_batch(
+    [{'sender': s, 'subject': sb, 'body': b} for s, sb, b in emails],
+    threshold=0.75,
+)
+for r in results:
+    print(r.predicted_label, r.phishing_probability)
+```
+
+**Full stack: calibration + zones + drift + LLM auto-review**
+
+```python
+from inference import (
+    DriftMonitor, PhishingDetector, AutoReviewer, LLMProvider,
+    ConfidenceZone, ReviewLabel,
+)
+
+monitor = DriftMonitor('logs/drift.jsonl', fpr_threshold=0.10)
+
+detector = PhishingDetector.from_paths(
+    model_path='models/v1_0/production/phishing_detector_mlp_classifier.pkl',
+    subject_vectorizer_path='models/pipeline_components/subject_vectorizer.pkl',
+    body_vectorizer_path='models/pipeline_components/body_vectorizer.pkl',
+    calibrator_path='models/pipeline_components/calibrator.pkl',
+    review_low_threshold=0.3,
+    review_high_threshold=0.8,
+    drift_monitor=monitor,
+)
+
+reviewer = AutoReviewer(LLMProvider.GROQ, api_key='gsk_...')
+
+result = detector.predict(sender, subject, body)
+review = reviewer.review_if_uncertain(result, sender, subject, body)
+
+# later, when the true label is confirmed:
+monitor.record_confirmation(result.prediction_id, confirmed_label=1)
+
+signal = monitor.drift_signal()
+if signal.status == 'WARNING':
+    print(signal.message)
+```
+
+**Online learning workflow**
+
+```python
+import pandas as pd
+from inference import OnlineLearner
+
+df = pd.read_csv('datasets/online_learning/brand_impersonation.csv')
+emails = df[['sender', 'subject', 'body', 'label']].to_dict('records')
+
+learner = OnlineLearner(
+    models_root='./models',
+    holdout_set=(holdout_df, y_holdout),
+)
+
+result = learner.partial_fit_batch(emails, max_iter_per_call=5)
+print(f"New version: {result.new_version}")
+print(f"F1 before:   {result.performance_before.get('f1', 'N/A')}")
+print(f"F1 after:    {result.performance_after.get('f1', 'N/A')}")
+print(f"OOV subject: {result.oov_rate_subject:.3f}")
+
+# Review metrics, then promote:
+learner.promote(result.new_version, min_delta_f1=-0.01)
+```
+
+See `inference/examples/demo_predict.ipynb`, `demo_online_learning.ipynb`, and
+`demo_drift_monitor.ipynb` for extended walkthroughs.
+
+### 9.2 FastAPI
+
+```bash
+pip install fastapi uvicorn
+uvicorn inference.examples.fastapi_app:app --reload
+```
+
+Configure via environment variables before starting. The app loads the
+production model at startup and exposes three endpoints:
+
+```
+POST /predict
+    {"sender": "...", "subject": "...", "body": "...", "threshold": 0.75}
+    → PredictionResult.to_dict(), with optional "auto_review" key when the
+      reviewer fires on a REVIEW-zone result.
+
+POST /confirm
+    {"prediction_id": "<uuid4>", "confirmed_label": 0 | 1}
+    → {"status": "recorded"}
+    404 if prediction_id is unknown; 503 if AURA_DRIFT_LOG is not set.
+
+GET /drift
+    → DriftSignal.to_dict()
+    503 if AURA_DRIFT_LOG is not set.
+```
+
+### 9.3 Flask
+
+```bash
+pip install flask
+flask --app inference.examples.flask_app run
+```
+
+Exposes the same `/predict`, `/confirm`, and `/drift` endpoints under the same
+environment-variable configuration. The model is initialised on the first
+request rather than at import time.
+
+### 9.4 CLI
+
+Single email:
+
+```bash
+python -m inference.examples.cli \
+  --sender '"PayPal" <noreply@paypa1-confirm.net>' \
+  --subject 'Confirm your account' \
+  --body 'Click here: http://paypa1-confirm.net/verify' \
+  --threshold 0.75
+```
+
+Batch (JSONL, one `{"sender":…,"subject":…,"body":…}` per line):
+
+```bash
+python -m inference.examples.cli --batch emails.jsonl --threshold 0.5
+```
+
+All flags:
+
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--sender / --subject / --body` | — | Single-email inputs |
+| `--batch <path>` | — | JSONL input file |
+| `--threshold <float>` | `0.75` | Decision threshold |
+| `--version <str>` | active/latest | Specific registry version |
+| `--models-root <path>` | `AURA_MODELS_DIR` or `./models` | Registry root |
+| `--calibrator-path <path>` | from registry | Calibrator pickle |
+| `--review-low / --review-high <float>` | disabled | REVIEW-zone thresholds (must pair) |
+| `--drift-log <path>` | disabled | Append-only JSONL drift log |
+| `--review-provider {groq,google}` | disabled | Enable LLM auto-review |
+| `--review-api-key <key>` | — | Required when `--review-provider` is set |
+
+Output is JSON: `result.to_dict()` per email, with an `"auto_review"` key
+appended when the reviewer fires.
+
+---
+
+## 10. Tests
+
+```bash
+pytest inference/tests/
+```
+
+| Test file | What it covers |
+|-----------|---------------|
+| `test_parity.py` | Verifies that `extract_engineered_features`, `normalize_for_tfidf`, and `build_feature_row` reproduce the exact values captured in `training_parity.json` (≥20 records). Skips when the fixture or vectorisers are absent. |
+| `test_preprocessing.py` | Unit tests for all feature primitives: entropy, OOV, URL counting, sender parsing, etc. |
+| `test_detector.py` | `PhishingDetector` construction validation, threshold edge cases, calibrator passthrough, zone bucketing, `predict_safe` error envelopes. |
+| `test_registry.py` | Version naming, path resolution, SHA-256 integrity checks, atomic JSON writes. |
+| `test_drift_monitor.py` | Replay from JSONL, confusion matrix arithmetic, duplicate confirmation rejection, FPR threshold gating. |
+| `test_auto_reviewer.py` | Provider dispatch, retry logic, malformed LLM response handling, `review_if_uncertain` zone gating. |
+| `test_calibrator_distinct_outputs.py` | Confirms the fitted beta calibrator produces distinct outputs (i.e., is not a no-op). |
+
+Re-generate the parity fixture after changes to preprocessing or training:
+
+```bash
+python inference/tests/fixtures/_generate_fixture.py
 ```
 
 ---
 
-## Model Information
+## 11. Limitations and known issues
 
-### Algorithm
-**Multi-Layer Perceptron (MLP) Classifier** - Neural network-based binary classifier
+**Calibrator type.** `_apply_calibrator` only supports prob-in/prob-out
+calibrators whose interface is `.transform([prob])` (netcal
+`HistogramBinning`) or `.predict([prob])` (scikit-learn `IsotonicRegression`,
+betacal `BetaCalibration`). Classifier-style calibrators such as
+`CalibratedClassifierCV` require the original feature matrix and raise
+`TypeError` at predict time.
 
-### Features (7,015 total)
+**Online-learning holdout.** Without a `holdout_set`, `OnlineLearner` has no
+ground truth to compute before/after metrics. Both `performance_before` and
+`performance_after` will be empty dicts. Do not call `promote(min_delta_f1=X)`
+without a holdout — the guard condition is skipped when metrics are absent,
+making promotion unconditional.
 
-**15 Engineered Features:**
-1. `body_word_count` - Word count in email body
-2. `body_exclamation_count` - Exclamation marks in body
-3. `email_local_length` - Length of email local part
-4. `name_email_consistency` - Name/email consistency score
-5. `body_url_density` - URL density ratio
-6. `body_url_count` - Number of URLs
-7. `body_entropy` - Shannon entropy (randomness)
-8. `email_digit_ratio` - Digit ratio in email
-9. `domain_entropy` - Domain randomness
-10. `domain_length` - Domain name length
-11. `subject_entropy` - Subject randomness
-12. `body_avg_word_length` - Average word length
-13. `sender_name_exists` - Presence of sender name
-14. `subject_exclamation_count` - Exclamation marks in subject
-15. `domain_vowel_consonant_ratio` - Vowel/consonant ratio
+**Thread safety.** `DriftMonitor` and `OnlineLearner` maintain per-instance
+in-memory state and are not safe to share across threads. Use one instance per
+thread. Cross-process writes are safe — both classes coordinate via
+`portalocker` on the log file or registry lock file.
 
-**7,000 TF-IDF Features:**
-- 2,000 from subject line
-- 5,000 from email body
+**Auto-reviewer latency.** Default configuration allows up to 3 total attempts
+(1 + `max_retries=2`) with a 30-second timeout each — worst-case ~90 seconds
+per `review()` call. Tune `timeout_seconds` and `max_retries` at construction
+for tighter SLAs.
 
-### Model Capabilities
-- Binary classification (Phishing/Legitimate)
-- Probability estimates (0.0-1.0)
-- Online learning support via `partial_fit`
-- Thread-safe inference
-- Batch processing
+**Corpus age.** The training data is from 2007–2008. The model has not seen
+modern phishing tactics at scale — see [§7](#7-the-scripts-folder) for the
+augmentation workflow designed to address this via online learning.
 
----
+**No feature scaling.** The MLP was trained on raw features with no
+`StandardScaler` or `MinMaxScaler`. Adding scaling in the inference path will
+silently break predictions. This is enforced by comment in `preprocessing.py`
+and by the parity fixture.
 
-## Contributing
-
-We welcome contributions! Please follow these guidelines:
-
-### Development Setup
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/your-feature-name`
-3. Make your changes
-4. Run tests (if available)
-5. Commit with descriptive messages
-6. Push to your fork
-7. Create a Pull Request
-
-### Code Style
-
-- Follow PEP 8 guidelines
-- Use type hints where applicable
-- Add docstrings to all functions/classes
-- Keep functions focused and modular
-
-### Adding New Features
-
-When adding features to the pipeline:
-1. Maintain backward compatibility
-2. Update `USAGE.md` with examples
-3. Add validation for new parameters
-4. Update version number in metadata
-
-### Reporting Issues
-
-Please include:
-- Python version
-- Library versions (scikit-learn, pandas, etc.)
-- Full error traceback
-- Minimal reproducible example
-
----
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## Additional Resources
-
-- **Detailed Usage Guide:** See [usage/phishing_detection/USAGE.md](usage/phishing_detection/USAGE.md) for comprehensive examples
-- **Jupyter Notebooks:** Explore `usage.ipynb` for interactive demonstrations
-- **Model Training:** See `model_training.ipynb` for training workflows
-
----
-
-## Contact & Support
-
-For questions, issues, or feature requests, please open an issue on the repository.
-
----
-
-**Built with ❤️ for cybersecurity and machine learning**
+**OOV vocabulary.** The TF-IDF vectorisers were fitted on the 2007–2008
+corpus. Modern brand names, product terms, and attack vocabulary are largely
+out-of-vocabulary. The `oov_rate_*` fields in `OnlineLearningResult` surface
+this; rates above 30% warrant attention.

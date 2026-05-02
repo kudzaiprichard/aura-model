@@ -34,6 +34,7 @@ package. Parity between the two is enforced by a golden fixture at
    - [FastAPI](#92-fastapi)
    - [Flask](#93-flask)
    - [CLI](#94-cli)
+   - [Streamlit dashboard](#95-streamlit-dashboard)
 10. [Tests](#10-tests)
 11. [Limitations and known issues](#11-limitations-and-known-issues)
 
@@ -102,8 +103,22 @@ AURA_Model/
 │   ├── preprocessing.py     Feature assembly pipeline
 │   ├── schema.py            Data contracts and enums
 │   ├── validation.py        Input validators
-│   ├── examples/            CLI, FastAPI, Flask, Jupyter demos
+│   ├── examples/
+│   │   ├── cli.py                   Single + batch CLI
+│   │   ├── fastapi_app.py           REST service
+│   │   ├── flask_app.py             REST service
+│   │   ├── demo_*.ipynb             Jupyter walkthroughs
+│   │   └── streamlit_dashboard/     Multi-page enterprise demo console
+│   │       ├── app.py               Landing page (hero + KPIs)
+│   │       ├── theme.py             Shared dark theme + components
+│   │       ├── utils.py             Cached loaders + upload helpers
+│   │       └── pages/               Predict, Batch, Auto Reviewer, Drift,
+│   │                                Online Learning, Benchmarks, Registry
 │   └── tests/               Parity, unit, and integration tests
+│
+├── .streamlit/
+│   └── config.toml          Dark-theme tokens for the Streamlit dashboard
+├── dashboard_data/          (gitignored) drift log produced by the dashboard
 │
 ├── scripts/                 Data-generation scripts for online-learning augmentation
 └── requirements.txt         Runtime dependencies of the inference package
@@ -302,6 +317,13 @@ The inference package tests require pytest and portalocker:
 
 ```bash
 pip install pytest portalocker
+```
+
+The Streamlit dashboard (see [§9.5](#95-streamlit-dashboard)) needs Streamlit
+and Plotly:
+
+```bash
+pip install streamlit plotly
 ```
 
 **Model resolution.** `PhishingDetector.load_production()` and
@@ -1149,6 +1171,49 @@ All flags:
 Output is JSON: `result.to_dict()` per email, with an `"auto_review"` key
 appended when the reviewer fires.
 
+### 9.5 Streamlit dashboard
+
+A multi-page demo console that exercises every capability of the `inference/`
+package — useful for stakeholder demos, internal QA, and ad-hoc what-if
+analysis without writing code.
+
+**Launch (from the repo root):**
+
+```bash
+pip install streamlit plotly
+streamlit run inference/examples/streamlit_dashboard/app.py
+```
+
+The dark enterprise theme (Inter typography, slate-and-blue palette, gradient
+hero, rounded cards, Plotly templates that match) is applied automatically
+from `.streamlit/config.toml` plus the CSS injected by
+`streamlit_dashboard/theme.py`.
+
+**Pages**
+
+| Page | Highlights |
+|------|------------|
+| **Overview** | Active version, registered-version count, F1/accuracy, metric trend across versions. |
+| **Predict** | Single-email scoring with version + threshold + zone + calibrator toggles, three-zone status pill, full engineered-feature bar chart, and optional drift-monitor logging. |
+| **Batch Predict** | Pre-loaded sample batches, multi-select synthetic CSVs, multi-file upload (`csv` / `json` / `jsonl` / `ndjson`), or paste a JSON array / JSONL / multi-dataset object. Confusion matrix when labels are present, per-dataset breakdown when multiple sources are mixed in, CSV export. |
+| **Auto Reviewer** | Provider picker (Groq / Google Gemini), session-only API key, optional ML pre-check showing why a prediction lands in REVIEW, `review()` and `review_if_uncertain()` paths. |
+| **Drift Monitor** | Live confusion-matrix heatmap, FPR-vs-threshold status banner, four tabs: confirm pending, manual record, replay a synthetic batch with ground-truth confirmations, raw log viewer with cumulative-FPR trace. |
+| **Online Learning** | Four input modes — single email, multi-row editor, synthetic CSV, **upload your own labelled CSV/JSON/JSONL** — with cap-rows + seed sub-sampling; runs `partial_fit_batch`, shows OOV rates and before/after metrics, F1-delta-guarded promotion. |
+| **Benchmarks** | Multi-select registered versions plus **upload extra `.pkl` models**, score on the calibration sub-sample or **on any labelled file you upload**. Side-by-side metric table, ROC + PR curves, per-model confusion matrices, probability-distribution overlay, exportable CSV. |
+| **Registry** | Version table with metrics + sha256, set-active button, integrity check, raw `model_metadata.json` viewer. |
+
+**Notes**
+
+- The dashboard reads from the same `models/` registry the rest of the package
+  uses. **Online Learning writes new versions into the live registry** —
+  treat its sandbox accordingly.
+- Drift logs are written to `dashboard_data/drift.jsonl` (gitignored), kept
+  separate from any production drift log.
+- API keys for Auto Reviewer live only in `st.session_state` and never touch
+  disk.
+- Heavy operations (model load, calibration sub-sampling, batch predictions)
+  are memoised via `st.cache_resource` and `st.cache_data`.
+
 ---
 
 ## 10. Tests
@@ -1213,3 +1278,79 @@ and by the parity fixture.
 corpus. Modern brand names, product terms, and attack vocabulary are largely
 out-of-vocabulary. The `oov_rate_*` fields in `OnlineLearningResult` surface
 this; rates above 30% warrant attention.
+
+---
+
+## 12. How this fits into AURA
+
+This repository produces and ships the model. It does not run a server. The
+artefacts under `models/` and the `inference/` package are consumed by
+[`aura_api`](https://github.com/kudzaiprichard/aura_api), which:
+
+1. Loads `PhishingDetector` into application state at startup
+   (`src/core/lifespan.py`) using `inference.models_dir` from its config.
+2. Calls `predict()` from `/api/v1/analysis/predict*` (dashboard +
+   programmatic) and `/api/v1/emails/analyze` (Chrome extension).
+3. Persists every prediction as a `prediction_events` row tagged with
+   `model_version`, the threshold used, and the engineered feature snapshot.
+4. Wires `DriftMonitor`, `OnlineLearner`, and `AutoReviewer` into REST surfaces
+   (`/drift`, `/training/runs`, `/review/*` auto-review).
+5. Exposes the model registry over `/api/v1/models/*` so analysts can upload,
+   activate, promote, and rollback versions through the dashboard.
+
+```mermaid
+flowchart LR
+    NB[Notebooks 01–05]-- write -->ART[(models/v1_*/<br/>pipeline_components/)]
+    SCR[scripts/gen_*.py]-- write -->OL[(datasets/online_learning/)]
+
+    subgraph Inference[inference/ package]
+        DET[PhishingDetector]
+        OL2[OnlineLearner]
+        DM[DriftMonitor]
+        AR[AutoReviewer]
+        REG[ModelRegistry]
+    end
+
+    ART-->REG
+    REG-->DET
+    OL-->OL2
+    OL2-- partial_fit registers v1_n+1 -->REG
+
+    subgraph API[aura_api]
+        STARTUP[lifespan.py]
+        PRED[/api/v1/analysis/predict<br/>/api/v1/emails/analyze/]
+        TRAIN[/api/v1/training/runs/]
+        DRIFT[/api/v1/drift/*/]
+    end
+
+    STARTUP-->DET
+    PRED-->DET
+    TRAIN-->OL2
+    DRIFT-->DM
+
+    subgraph Clients
+        DASH[aura_dashbord]
+        EXT[AURA_Chrome_Extension]
+    end
+
+    DASH-->TRAIN
+    DASH-->DRIFT
+    DASH-->PRED
+    EXT-->PRED
+```
+
+A model version produced by these notebooks (or by a successful
+`OnlineLearner.partial_fit_batch` run kicked off from the dashboard) is
+promoted via the API's model-management endpoints — the artefact layout in
+`models/` is the wire contract between the two.
+
+---
+
+## 13. Related Repositories
+
+| Repo | Role | Description |
+|---|---|---|
+| **[AURA_Model](https://github.com/kudzaiprichard/aura-model)** | ML pipeline (this repo) | Training notebooks, dataset scripts, and the `inference/` Python package consumed by the backend. |
+| [aura_api](https://github.com/kudzaiprichard/aura_api) | Backend | FastAPI service. Loads `PhishingDetector` at startup and exposes prediction, drift, training, and model-registry endpoints. |
+| [AURA_Chrome_Extension](https://github.com/kudzaiprichard/aura-chrome-extension) | Browser client | Manifest V3 Gmail extension. Calls the API's `/emails/analyze`, which calls into this package. |
+| [aura_dashbord](https://github.com/kudzaiprichard/aura_dashboard) | Web client | Next.js 16 console. Surfaces this package's `ModelRegistry`, `DriftMonitor`, and `OnlineLearner` outputs to analysts and admins. |

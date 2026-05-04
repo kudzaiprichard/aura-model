@@ -6,7 +6,7 @@ This script transcribes the training-side formulas VERBATIM from the notebooks
 It is deliberately standalone: it does NOT import from inference.* so the
 parity test can compare independent implementations.
 
-Run once from the repo root (the directory containing `datasets/` and
+Run once from the repo root (the directory containing `_datasets/` and
 `models/`):
     python inference/tests/fixtures/_generate_fixture.py
 """
@@ -323,7 +323,7 @@ def _pick_rows(df: pd.DataFrame, rng: np.random.Generator) -> pd.DataFrame:
 
 def main():
     repo_root = Path(__file__).resolve().parents[3]
-    cleaned_csv = repo_root / 'datasets' / 'processed' / 'cleaned_email_dataset.csv'
+    cleaned_csv = repo_root / '_datasets' / 'processed' / 'cleaned_email_dataset.csv'
     subject_vec_path = repo_root / 'models' / 'pipeline_components' / 'subject_vectorizer.pkl'
     body_vec_path = repo_root / 'models' / 'pipeline_components' / 'body_vectorizer.pkl'
     out_path = Path(__file__).with_name('training_parity.json')

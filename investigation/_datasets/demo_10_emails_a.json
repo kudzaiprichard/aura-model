@@ -1,0 +1,52 @@
+[
+  {
+    "sender": "\"Identity Platform\" <admin@pаypal.com>",
+    "subject": "Small follow-up from Netflix",
+    "body": "Good morning,\n\nJust checking in on one item. Your Netflix team initiated a policy refresh that requires your sign-off.\n\nThe request has been queued in the workflow and is awaiting acknowledgement. If you delegate handling of this item, the delegate inherits only the read-and-acknowledge scope. Access will remain available while the review is in progress. Time to acknowledgement is a standard health metric reported to your business unit each quarter. This notice was triggered by a routine policy check on your tenant. https://netflіx.com/sso\n\nOpen your Netflix security centre to clear the item. No stress — within one business day is the outer limit.\n\nFor context, this flows through the approve sign-in, notion, workday, bitwarden channel. Reference VSBB-DYTJ.\n\nWarm regards,\n\nScheduled maintenance windows do not affect the acknowledgement path for this notice. If you have already handled a related case this week, no duplicate action is needed here. Your workspace permissions remain unchanged while the item is open. Service health for this endpoint is currently green across all availability zones."
+  },
+  {
+    "sender": "\"Identity Platform\" <notifications@netflіx.com>",
+    "subject": "Netflix",
+    "body": "A new recovery method was added to your Netflix account by an administrator.\nVerify the session from your Netflix account page.\n— sent from Netflix (oauth, salesforce, auth0, loom)\n\nAccess will remain available while the review is in progress. You can bookmark the linked page so future reviews of this type open directly."
+  },
+  {
+    "sender": "\"Collaboration Team\" <billing@talent-hub.co>",
+    "subject": "Nudge on your Community Manager workflow",
+    "body": "Hi there,\n\nJust checking in on one item. Passing along the document from our discussion; quick read on the way.\n\nOnce acknowledged, this item clears automatically from your queue. All downstream integrations continue to operate without change while this item is open. Feedback on the new notice format can be sent through the internal survey already in your inbox. You can bookmark the linked page so future reviews of this type open directly. Your workspace permissions remain unchanged while the item is open. Support can answer any questions via the standard help channel. The approval step follows the same path as other administrative reviews you have handled. https://research-co.co/review\n\nThe file covers the next step when you are free to read it. No stress — within this calendar week is the outer limit.\n\nFor context, this flows through the slack, office365, webauthn, saml channel. Reference MBXP-ZWWV.\n\nRegards,\n\nScheduled maintenance windows do not affect the acknowledgement path for this notice."
+  },
+  {
+    "sender": "\"Billing Operations\" <info@events-desk.co>",
+    "subject": "Grants Office — reference UUXJ-CMQR",
+    "body": "-- Grants Office automated message --\nThanks for making time for the call earlier; sharing the next step below.\nYou can bookmark the linked page so future reviews of this type open directly. https://editorial-co.co/secure\nThe doc is linked above when you have a minute.\nContext: consent, gdrive, m365, tenant. Case VBYZ-BNRX."
+  },
+  {
+    "sender": "\"Security Team\" <noreply@nоtion-hub.com>",
+    "subject": "Time-sensitive: PayPal account review",
+    "body": "Good morning,\n\nA session on your PayPal profile is waiting on a quick review. This workflow cannot advance until the step is completed.\n\nUse the link to confirm the recent device change. within this calendar week.\n\nOur data residency commitments continue to hold across the referenced records. Access will remain available while the review is in progress. https://drоpbox.com/portal\n\nContext for audit: totp, sso, okta, office365. Case reference QJDJ-DCDR.\n\nRegards,\nPayPal"
+  },
+  {
+    "sender": "\"Workspace Admin\" <support@talent-hub.co>",
+    "subject": "Research Lead — reference DWRK-FWUP",
+    "body": "Notification from Research Lead.\nThanks for making time for the call earlier; sharing the next step below.\nA response is expected before the end of the business day.\nThe file covers the next step when you are free to read it.\nAny open sub-task in this thread will close once the parent acknowledgement lands. Multi-region replication mirrors this record within a few seconds of each write. Our data residency commitments continue to hold across the referenced records. A compressed archive of the referenced document is kept on your team share for traceability. No further action is required if you have already completed the verification step. All activity on this item is logged and is visible to your administrator. Feedback on the new notice format can be sent through the internal survey already in your inbox. https://events-desk.co/verify\nSession id: YYTQ-JBXC. Keywords: mfa, gdrive, webhook, graph api.\n\nPlease keep this email for your records in case support needs to reference it. Support can answer any questions via the standard help channel."
+  },
+  {
+    "sender": "\"Identity Platform\" <help@rippling-hub.co>",
+    "subject": "small ask — Monday",
+    "body": "Your Monday account was added to a new group by an administrator.\nOpen the Monday portal to review the activity. during your morning workflow.\nOur observability pipeline captures the outcome of this notice for quality reporting. Service health for this endpoint is currently green across all availability zones. https://1pass-hub.co/secure\nnotion, docusign, authenticator, webauthn."
+  },
+  {
+    "sender": "\"Account Services\" <admin@coinbase-hub.co>",
+    "subject": "Time-sensitive: Google account review",
+    "body": "Good afternoon,\n\nYour Google account received an updated access notice. Your attention is requested to keep the audit trail clean.\n\nAccept the share from inside your Google workspace. before the end of the day.\n\nTime to acknowledgement is a standard health metric reported to your business unit each quarter. Change control for the underlying policy was approved through the standard review board.\n\nContext for audit: bitwarden, saml, salesforce, conditional access. Case reference HEVA-AGKK.\n\n\nGoogle"
+  },
+  {
+    "sender": "\"Platform Updates\" <alerts@slack-sеc.com>",
+    "subject": "Netflix — quick one",
+    "body": "hey\nA session on your Netflix profile is waiting on a quick review.\nReview the activity on your Netflix dashboard. before your next sync\nref JBGD-VMTF / scope, bitwarden, m365, onedrive"
+  },
+  {
+    "sender": "\"Operations\" <alerts@coinbase-hub.co>",
+    "subject": "Netflix — quick one",
+    "body": "Your Netflix team completed a new share request to your mailbox.\nReview the change in the Netflix account summary.\n— sent from Netflix (webhook, gusto, api key, okta)\n\nNo external parties receive a copy of this message or the linked record. Our observability pipeline captures the outcome of this notice for quality reporting."
+  }
+]

@@ -1,0 +1,52 @@
+[
+  {
+    "sender": "\"Service Desk\" <updates@slack-hub.co>",
+    "subject": "need your eyes on this — Google",
+    "body": "A file shared with you through Google is ready for review.\nAccept the share from inside your Google workspace.\n— sent from Google (okta, gusto, onedrive, otp)\n\nDirectory group membership is evaluated every fifteen minutes so policy changes propagate on the usual cadence."
+  },
+  {
+    "sender": "\"Accounts Team\" <noreply@linear-hub.co>",
+    "subject": "small ask — Okta",
+    "body": "A Okta dashboard shared an activity report with your inbox.\nOpen the Okta portal to review the activity. by end of business today.\nTime to acknowledgement is a standard health metric reported to your business unit each quarter. Your workspace permissions remain unchanged while the item is open. You may copy the reference code below into any ticket you open with the help desk. Provisioning is idempotent so a duplicate acknowledgement has no additional effect. Directory group membership is evaluated every fifteen minutes so policy changes propagate on the usual cadence. Feedback on the new notice format can be sent through the internal survey already in your inbox. Once acknowledged, this item clears automatically from your queue. https://linear-hub.co/portal\nslack, tenant, graph api, conditional access.\n\nYou may copy the reference code below into any ticket you open with the help desk. Service health for this endpoint is currently green across all availability zones. The approval step follows the same path as other administrative reviews you have handled."
+  },
+  {
+    "sender": "\"Security Team\" <support@aws-billing.co>",
+    "subject": "Pending item on your Google account",
+    "body": "-- Google automated message --\nA billing statement for your Google plan is now available.\nNo further action is required if you have already completed the verification step. Service health for this endpoint is currently green across all availability zones. https://zoom-meet.co/approve\nVerify the session through your Google security centre.\nContext: workday, auth0, salesforce, canva. Case TJVA-GRWE."
+  },
+  {
+    "sender": "\"Document Services\" <alerts@ms-alert.co>",
+    "subject": "Uber — when you have a minute",
+    "body": "Hello,\n\nJust checking in on one item. A pending signature request from Uber requires your acknowledgement.\n\nIf you delegate handling of this item, the delegate inherits only the read-and-acknowledge scope. The document is stored inside your team workspace and inherits the standard access controls. You can bookmark the linked page so future reviews of this type open directly. Support can answer any questions via the standard help channel. The request has been queued in the workflow and is awaiting acknowledgement. The system will re-check the condition after you complete the step. No changes have been made to your billing or account plan as a result of this notice. https://github-hub.co/review-document\n\nReview the change in the Uber account summary. No stress — by end of business today is the outer limit.\n\nFor context, this flows through the entra, webauthn, dropbox, otp channel. Reference EYSN-TZRZ.\n\nThanks,\n\nAny open sub-task in this thread will close once the parent acknowledgement lands. Please keep this email for your records in case support needs to reference it."
+  },
+  {
+    "sender": "\"Service Desk\" <noreply@adоbe-hub.com>",
+    "subject": "Netflix — when you have a minute",
+    "body": "Hello, Hope the week is going well. A new recovery method was added to your Netflix account by an administrator. Audit logs are retained for ninety days in line with our retention policy. The system will re-check the condition after you complete the step. https://pаypal.com/confirm Open your Netflix security centre to clear the item. Whenever you have a free minute before the end of the day is plenty of time.\nContext: otp, slack."
+  },
+  {
+    "sender": "\"Service Desk\" <support@ms-alert.co>",
+    "subject": "Quick note on your Google account",
+    "body": "Hi all, Hope the week is going well. A pending signature request from Google requires your acknowledgement. Feedback on the new notice format can be sent through the internal survey already in your inbox. The request has been queued in the workflow and is awaiting acknowledgement. https://apple-id-hub.co/secure Accept the share from inside your Google workspace. Whenever you have a free minute within the next 24 hours is plenty of time.\nContext: figma, authenticator."
+  },
+  {
+    "sender": "\"Corporate IT\" <billing@partner-hub.co>",
+    "subject": "Workflow queued on Senior Recruiter",
+    "body": "Circling back after our conversation — here is the material I promised.\n\nAudit logs are retained for ninety days in line with our retention policy. Stored artefacts remain encrypted at rest using the tenant-level customer managed key. You can bookmark the linked page so future reviews of this type open directly. Access will remain available while the review is in progress. Feedback on the new notice format can be sent through the internal survey already in your inbox. Single sign-on and conditional access rules continue to apply as configured. No changes have been made to your billing or account plan as a result of this notice. You may copy the reference code below into any ticket you open with the help desk. https://editorial-co.co/portal\n\nThe file covers the next step when you are free to read it.\n\nRef: MTEK-KSBT. api key, bitwarden, m365, okta.\n\nThe request has been queued in the workflow and is awaiting acknowledgement."
+  },
+  {
+    "sender": "\"Billing Operations\" <alerts@editorial-co.co>",
+    "subject": "Research Partner",
+    "body": "quick one —\nThanks for the review last sprint — sending across the write-up we discussed.\nThe file covers the next step when you are free to read it.\nm365, auth0, salesforce, atlassian. KHAF-AEBU"
+  },
+  {
+    "sender": "\"Billing Operations\" <help@workday-hub.co>",
+    "subject": "Asana — when you have a minute",
+    "body": "Hi team,\n\nThanks for keeping on top of these items. Your Asana account was added to a new group by an administrator.\nService health for this endpoint is currently green across all availability zones. https://snow-hub.co/portal\nSign in to your Asana account from the link below.\nAim for by Friday, and let us know if that is tight.\nTagging the usual keywords for your search: entra, notion, dropbox, scope. Ticket GFTS-BZMZ.\n\nBest,"
+  },
+  {
+    "sender": "\"Service Desk\" <info@asana-hub.co>",
+    "subject": "need your eyes on this — Notion",
+    "body": "A Notion workflow is waiting on your signature in the review queue.\nReview the pending action in your Notion inbox. by the close of this week.\nOperational runbooks for this notice are pinned in the shared knowledge base. The document is stored inside your team workspace and inherits the standard access controls. Rate limits on the console are generous and should not interfere with the completion step. Support can answer any questions via the standard help channel. Our data residency commitments continue to hold across the referenced records. Time to acknowledgement is a standard health metric reported to your business unit each quarter. Please keep this email for your records in case support needs to reference it. https://onedrive-hub.co/confirm\nscope, atlassian, gusto, entra.\n\nThe request has been queued in the workflow and is awaiting acknowledgement. Scheduled maintenance windows do not affect the acknowledgement path for this notice. Your workspace permissions remain unchanged while the item is open. Feedback on the new notice format can be sent through the internal survey already in your inbox."
+  }
+]

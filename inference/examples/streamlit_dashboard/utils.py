@@ -1,8 +1,17 @@
-"""Shared helpers for the AURA Streamlit dashboard.
+"""Shared helpers for the AURA inference dashboard.
 
-Centralises model/registry loading, drift-monitor lifecycle, sample data,
-and small UI utilities. Loaders are wrapped in `st.cache_resource` so a
-detector or registry is loaded once per Streamlit session.
+Centralises registry/model loading, upload parsing, in-memory templates,
+benchmark persistence, and small UI utilities. Heavy loaders are wrapped in
+`st.cache_resource` / `st.cache_data` so a detector is loaded once per session.
+
+The dashboard ships five production capabilities:
+
+    Predict · Batch Predict · Model Management · Online Learning · Benchmarks
+
+The dashboard never auto-loads datasets from disk — the only built-in data is
+the small set of in-memory sample emails (:data:`SAMPLE_EMAILS` /
+:data:`SAMPLE_BATCHES`). For everything else the user imports their own CSV /
+JSON files; downloadable templates are generated in-memory from the samples.
 """
 
 from __future__ import annotations
@@ -10,10 +19,10 @@ from __future__ import annotations
 import io
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import joblib
-import numpy as np
 import pandas as pd
 import streamlit as st
 
@@ -23,7 +32,6 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from inference import (  # noqa: E402
-    DriftMonitor,
     ModelRegistry,
     PhishingDetector,
 )
@@ -32,24 +40,42 @@ from inference.registry import default_models_root  # noqa: E402
 
 REPO_ROOT = _REPO_ROOT
 DASHBOARD_DATA_DIR = REPO_ROOT / 'dashboard_data'
-DRIFT_LOG_PATH = DASHBOARD_DATA_DIR / 'drift.jsonl'
-SYNTHETIC_DIR = REPO_ROOT / '_datasets' / 'online_learning'
-CALIBRATION_X = REPO_ROOT / '_datasets' / 'calibration' / 'X_val.npy'
-CALIBRATION_Y = REPO_ROOT / '_datasets' / 'calibration' / 'y_val.npy'
+BENCHMARKS_DIR = DASHBOARD_DATA_DIR / 'benchmarks'
+
+# Sentinel used by model selectboxes to mean "fall back to the active model".
+ACTIVE_CHOICE = 'Active model (default)'
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# Cached loaders
+# Registry & model loaders
 # ──────────────────────────────────────────────────────────────────────────
 
 @st.cache_resource(show_spinner=False)
 def get_models_root() -> Path:
-    return default_models_root()
+    """Locate the models directory.
+
+    Prefers ``default_models_root()`` (``AURA_MODELS_DIR`` env or ``cwd/models``)
+    and falls back to ``<repo>/models`` so the dashboard works no matter which
+    directory Streamlit was launched from.
+    """
+    try:
+        return default_models_root()
+    except FileNotFoundError:
+        candidate = REPO_ROOT / 'models'
+        if candidate.exists():
+            return candidate.resolve()
+        raise
 
 
 @st.cache_resource(show_spinner=False)
 def get_registry() -> ModelRegistry:
     return ModelRegistry(get_models_root())
+
+
+def clear_registry_caches() -> None:
+    """Drop cached registry + detectors after a mutation (activate / delete / train)."""
+    get_registry.clear()
+    load_detector.clear()
 
 
 @st.cache_resource(show_spinner='Loading model…')
@@ -59,9 +85,9 @@ def load_detector(
     review_high: float | None = None,
     use_calibrator: bool = False,
 ) -> PhishingDetector:
-    """Load a specific version (or active if None) with optional thresholds.
+    """Load a specific version (or active if ``None``) with optional thresholds.
 
-    The cache key includes all four args so different threshold/calibrator
+    The cache key includes all four args so different threshold / calibrator
     settings each get their own cached detector.
     """
     registry = get_registry()
@@ -86,9 +112,77 @@ def load_detector(
     )
 
 
+def resolve_version(choice: str | None) -> str:
+    """Map a selectbox choice to a concrete version.
+
+    ``None`` or :data:`ACTIVE_CHOICE` resolve to the active version (or the
+    latest on disk when nothing is active). Anything else is returned as-is.
+    """
+    registry = get_registry()
+    if choice is None or choice == ACTIVE_CHOICE:
+        resolved = registry.active_version() or registry.latest_version()
+        if resolved is None:
+            raise FileNotFoundError('No model versions found in registry.')
+        return resolved
+    return choice
+
+
+def version_metrics(version: str) -> dict:
+    """Return the recorded holdout metrics for a version (or empty dict)."""
+    meta = get_registry()._read_registry_metadata()
+    return (meta.get('versions', {}).get(version, {}) or {}).get('metrics', {}) or {}
+
+
+def sidebar_status() -> None:
+    """Consistent brand + live registry status rail shown on every page."""
+    registry = get_registry()
+    active = registry.active_version()
+    versions = registry.list_versions()
+    with st.sidebar:
+        st.markdown('### 🛡️ AURA')
+        st.caption('Adaptive User Risk Analyzer')
+        st.divider()
+        c1, c2 = st.columns(2)
+        c1.metric('Active model', active or '—')
+        c2.metric('Versions', len(versions))
+        if active is None:
+            st.caption('⚠️ No active model — predictions use the latest version.')
+        st.divider()
+
+
+def model_version_selector(
+    label: str = 'Model',
+    *,
+    key: str | None = None,
+    help: str | None = 'Leave on "Active model (default)" to use the live model.',
+) -> str:
+    """Render a model selectbox that defaults to the active model.
+
+    Returns a concrete version string (already resolved through
+    :func:`resolve_version`).
+    """
+    registry = get_registry()
+    versions = registry.list_versions()
+    active = registry.active_version()
+    options = [ACTIVE_CHOICE] + versions
+    choice = st.selectbox(
+        label,
+        options,
+        index=0,
+        format_func=lambda v: (
+            f'{ACTIVE_CHOICE}  →  {active}' if v == ACTIVE_CHOICE and active
+            else ('Active model (none set — uses latest)' if v == ACTIVE_CHOICE
+                  else (f'{v}  ·  active' if v == active else v))
+        ),
+        key=key,
+        help=help,
+    )
+    return resolve_version(choice)
+
+
 @st.cache_resource(show_spinner=False)
 def get_pipeline_vectorisers() -> tuple:
-    """Load the shared subject/body vectorisers from `pipeline_components/`.
+    """Load the shared subject/body vectorisers from ``pipeline_components/``.
 
     These are version-agnostic: every registered model is trained against the
     same TF-IDF vocabularies, so we can re-use them to vectorise raw uploaded
@@ -115,7 +209,7 @@ def vectorise_emails(df: pd.DataFrame):
 def load_uploaded_model(file):
     """Load a joblib-serialised classifier from a Streamlit UploadedFile.
 
-    Validates that it exposes `predict_proba` and that `n_features_in_`
+    Validates that it exposes ``predict_proba`` and that ``n_features_in_``
     (when present) matches the registry's expected feature count.
     """
     from inference.schema import TOTAL_FEATURES
@@ -137,19 +231,8 @@ def load_uploaded_model(file):
     return model
 
 
-@st.cache_resource(show_spinner=False)
-def get_drift_monitor(fpr_threshold: float = 0.10) -> DriftMonitor:
-    DASHBOARD_DATA_DIR.mkdir(parents=True, exist_ok=True)
-    return DriftMonitor(DRIFT_LOG_PATH, fpr_threshold=fpr_threshold)
-
-
-def reset_drift_monitor() -> None:
-    """Clear cached monitor so a new one is built (e.g. after log reset)."""
-    get_drift_monitor.clear()
-
-
 # ──────────────────────────────────────────────────────────────────────────
-# Sample emails & _datasets
+# Pre-loaded in-memory demo emails (no files required)
 # ──────────────────────────────────────────────────────────────────────────
 
 SAMPLE_EMAILS: list[dict] = [
@@ -194,7 +277,9 @@ SAMPLE_EMAILS: list[dict] = [
 
 
 SAMPLE_BATCHES: dict[str, list[dict]] = {
-    'Mixed showcase (4 emails)': [dict(e) for e in SAMPLE_EMAILS],
+    'Mixed showcase (4 emails)': [
+        {k: v for k, v in e.items() if k != 'name'} for e in SAMPLE_EMAILS
+    ],
     'Phishing pair': [
         {
             'sender': '"PayPal Security" <service@paypa1-alerts.com>',
@@ -234,43 +319,36 @@ SAMPLE_BATCHES: dict[str, list[dict]] = {
 }
 
 
-def list_synthetic_datasets() -> list[str]:
-    if not SYNTHETIC_DIR.exists():
-        return []
-    return sorted(p.name for p in SYNTHETIC_DIR.glob('*.csv'))
-
-
-@st.cache_data(show_spinner=False)
-def load_synthetic_csv(name: str) -> pd.DataFrame:
-    path = SYNTHETIC_DIR / name
-    return pd.read_csv(path)
-
-
 # ──────────────────────────────────────────────────────────────────────────
-# Calibration matrix (for benchmarks)
+# In-memory CSV templates
+#
+# The dashboard never auto-loads datasets from disk — users import their own
+# files. These helpers build small, correctly-shaped templates entirely from
+# the in-memory sample emails so a user can download one, fill it in, and
+# re-upload, without any dataset file needing to exist on disk.
 # ──────────────────────────────────────────────────────────────────────────
 
-@st.cache_data(show_spinner=False)
-def load_calibration_subset(n: int = 800, seed: int = 0) -> tuple[np.ndarray, np.ndarray]:
-    """Return a deterministic subsample of the calibration matrix.
+def prediction_template_bytes() -> bytes:
+    """A CSV template for Predict / Batch Predict (sender, subject, body)."""
+    rows = [{k: e[k] for k in REQUIRED_FIELDS} for e in SAMPLE_EMAILS]
+    return df_to_csv_bytes(pd.DataFrame(rows, columns=list(REQUIRED_FIELDS)))
 
-    The full file is ~800 MB so we mmap and slice rather than copy.
+
+def labelled_template_bytes() -> bytes:
+    """A CSV template for Online Learning / Benchmarks (sender, subject, body, label).
+
+    Phishing samples get label 1, the rest label 0 — purely illustrative so the
+    column shape and value domain are obvious.
     """
-    if not CALIBRATION_X.exists() or not CALIBRATION_Y.exists():
-        raise FileNotFoundError(
-            f'Calibration data not found at {CALIBRATION_X} / {CALIBRATION_Y}'
-        )
-    X = np.load(CALIBRATION_X, mmap_mode='r')
-    y = np.load(CALIBRATION_Y)
-    n = min(n, X.shape[0])
-    rng = np.random.default_rng(seed)
-    idx = rng.choice(X.shape[0], size=n, replace=False)
-    idx.sort()
-    return np.asarray(X[idx]), y[idx]
+    rows = []
+    for e in SAMPLE_EMAILS:
+        label = 1 if 'Phishing' in e['name'] else 0
+        rows.append({**{k: e[k] for k in REQUIRED_FIELDS}, 'label': label})
+    return df_to_csv_bytes(pd.DataFrame(rows, columns=list(TRAINING_FIELDS)))
 
 
 # ──────────────────────────────────────────────────────────────────────────
-# Parsing helpers (for batch upload)
+# Upload parsing helpers
 # ──────────────────────────────────────────────────────────────────────────
 
 REQUIRED_FIELDS = ('sender', 'subject', 'body')
@@ -278,11 +356,7 @@ TRAINING_FIELDS = ('sender', 'subject', 'body', 'label')
 
 
 def read_uploaded_table(file) -> pd.DataFrame:
-    """Read a Streamlit UploadedFile of CSV / JSON / JSONL into a DataFrame.
-
-    Pandas figures out the format from the extension, but we also auto-detect
-    bare-JSON arrays vs JSONL lines so users can drop in either shape.
-    """
+    """Read a Streamlit UploadedFile of CSV / JSON / JSONL into a DataFrame."""
     name = (getattr(file, 'name', '') or '').lower()
     raw = file.read() if hasattr(file, 'read') else file
     if isinstance(raw, bytes):
@@ -291,9 +365,9 @@ def read_uploaded_table(file) -> pd.DataFrame:
         text = str(raw)
     if name.endswith('.csv'):
         return pd.read_csv(io.StringIO(text))
-    if name.endswith('.jsonl') or name.endswith('.ndjson') or name.endswith('.json'):
+    if name.endswith(('.jsonl', '.ndjson', '.json')):
         return pd.DataFrame(parse_jsonl(text))
-    # Fallback — try CSV, then JSON in any shape
+    # Fallback — try CSV, then JSON in any shape.
     try:
         return pd.read_csv(io.StringIO(text))
     except Exception:
@@ -303,8 +377,9 @@ def read_uploaded_table(file) -> pd.DataFrame:
 def select_email_columns(df: pd.DataFrame, *, with_label: bool) -> pd.DataFrame:
     """Validate and project a DataFrame down to the fields the model needs.
 
-    Drops every column except sender / subject / body (and label when
-    `with_label` is True). Raises ValueError if a required field is missing.
+    Drops every extra column (``category``, ``notes``, …) and keeps only
+    sender / subject / body (and label when ``with_label`` is True). Raises
+    ValueError if a required field is missing.
     """
     fields = TRAINING_FIELDS if with_label else REQUIRED_FIELDS
     missing = [f for f in fields if f not in df.columns]
@@ -328,17 +403,10 @@ def select_email_columns(df: pd.DataFrame, *, with_label: bool) -> pd.DataFrame:
 
 
 def parse_jsonl(text: str) -> list[dict]:
-    """Accepts JSONL, a JSON array, or a JSON object whose values are arrays.
-
-    A single bare JSON array `[ {...}, {...} ]` is returned as that list.
-    A `{ "name_a": [...], "name_b": [...] }` shape (multiple _datasets in one
-    JSON file) is flattened, with each row tagged via a `_dataset` key.
-    Falls back to line-by-line JSONL when the document is not valid JSON.
-    """
+    """Accepts JSONL, a JSON array, or a JSON object whose values are arrays."""
     stripped = text.strip()
     if not stripped:
         return []
-    # Skip comment-only / blank lines so the JSONL placeholder copy/paste works.
     cleaned = '\n'.join(
         ln for ln in text.splitlines()
         if ln.strip() and not ln.lstrip().startswith('#')
@@ -396,31 +464,38 @@ def df_to_csv_bytes(df: pd.DataFrame) -> bytes:
 
 
 # ──────────────────────────────────────────────────────────────────────────
+# Benchmark run persistence (saved as JSON)
+# ──────────────────────────────────────────────────────────────────────────
+
+def save_benchmark_run(payload: dict) -> Path:
+    """Persist a benchmark run to ``dashboard_data/benchmarks/`` as JSON.
+
+    Returns the path written. The filename is timestamped so runs never clash.
+    """
+    BENCHMARKS_DIR.mkdir(parents=True, exist_ok=True)
+    ts = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    path = BENCHMARKS_DIR / f'benchmark_{ts}.json'
+    path.write_text(json.dumps(payload, indent=2), encoding='utf-8')
+    return path
+
+
+def list_benchmark_runs() -> list[Path]:
+    """Return saved benchmark JSON files, newest first."""
+    if not BENCHMARKS_DIR.exists():
+        return []
+    return sorted(BENCHMARKS_DIR.glob('benchmark_*.json'), reverse=True)
+
+
+def load_benchmark_run(path: Path) -> dict:
+    return json.loads(Path(path).read_text(encoding='utf-8'))
+
+
+# ──────────────────────────────────────────────────────────────────────────
 # Misc UI helpers
 # ──────────────────────────────────────────────────────────────────────────
 
-def zone_color(zone: str | None) -> str:
-    if zone == 'SPAM':
-        return '#e74c3c'
-    if zone == 'NOT_SPAM':
-        return '#2ecc71'
-    if zone == 'REVIEW':
-        return '#f39c12'
-    return '#7f8c8d'
-
-
-def label_color(label: int) -> str:
-    return '#e74c3c' if label == 1 else '#2ecc71'
-
-
 def label_word(label: int) -> str:
     return 'PHISHING' if label == 1 else 'LEGITIMATE'
-
-
-def section_header(title: str, subtitle: str | None = None) -> None:
-    st.markdown(f'### {title}')
-    if subtitle:
-        st.caption(subtitle)
 
 
 def confusion_metrics(tp: int, tn: int, fp: int, fn: int) -> dict[str, float]:

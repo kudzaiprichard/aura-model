@@ -30,6 +30,13 @@ __pycache__/
 # Streamlit dashboard runtime data (drift logs, etc.)
 dashboard_data/
 
+# Streamlit app config
+.streamlit/
+
 # Inference fixtures are tracked even though _datasets/ and *.csv are not.
 !inference/tests/fixtures/
 !inference/tests/fixtures/*.json
+
+# Investigation datasets are tracked (override *.csv exclusion)
+!investigation/_datasets/
+!investigation/_datasets/*.csv

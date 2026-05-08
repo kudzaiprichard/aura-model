@@ -168,6 +168,65 @@ class ModelRegistry:
         self._write_registry_metadata(meta)
         log.info('promoted version=%s metrics=%s', version, metrics)
 
+    def deactivate(self) -> None:
+        """Clear the active-version pointer.
+
+        Leaves every version on disk untouched; afterwards no model serves
+        by default until `set_active` is called again. Callers that resolve a
+        model with `active_version() or latest_version()` will fall back to
+        the latest version on disk.
+        """
+        meta = self._read_registry_metadata()
+        meta['active_version'] = None
+        self._write_registry_metadata(meta)
+        log.info('active_version cleared (deactivated)')
+
+    def update_version_metadata(
+        self,
+        version: str,
+        *,
+        metrics: dict[str, float] | None = None,
+        notes: str | None = None,
+    ) -> None:
+        """Patch the registry-level metadata for a version.
+
+        `metrics` replaces the stored metrics dict; `notes` sets a free-text
+        annotation. Either may be omitted to leave that field unchanged.
+        """
+        if version not in self.list_versions():
+            raise ValueError(f'Unknown version: {version!r}')
+        meta = self._read_registry_metadata()
+        versions = meta.setdefault('versions', {})
+        entry = versions.setdefault(version, {})
+        if metrics is not None:
+            entry['metrics'] = dict(metrics)
+        if notes is not None:
+            entry['notes'] = str(notes)
+        self._write_registry_metadata(meta)
+        log.info('updated metadata for version=%s', version)
+
+    def delete_version(self, version: str) -> None:
+        """Remove a version's artefacts from disk and its metadata entry.
+
+        Shared `pipeline_components/` (vectorisers, calibrator) are never
+        touched. If the deleted version was active, the active pointer is
+        cleared so the registry never points at a missing model.
+        """
+        if _parse_version(version) is None:
+            raise ValueError(f'Invalid version string: {version!r}')
+        version_dir = self.models_root / version
+        if not version_dir.exists():
+            raise ValueError(f'Unknown version: {version!r}')
+        shutil.rmtree(version_dir)
+        meta = self._read_registry_metadata()
+        versions = meta.setdefault('versions', {})
+        versions.pop(version, None)
+        if meta.get('active_version') == version:
+            meta['active_version'] = None
+            log.info('deleted active version=%s; active pointer cleared', version)
+        self._write_registry_metadata(meta)
+        log.info('deleted version=%s', version)
+
     # -- registration -----------------------------------------------------
     def register_new_version(
         self,

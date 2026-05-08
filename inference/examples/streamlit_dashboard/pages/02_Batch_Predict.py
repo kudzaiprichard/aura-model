@@ -1,4 +1,11 @@
-"""Batch Predict page — score many emails at once with charts and export."""
+"""Batch Predict page — score many emails at once.
+
+Sources:
+  1. Choose a model (defaults to the active model).
+  2. Upload a CSV or JSON file shaped like ``demo_10_emails_a.csv`` /
+     ``demo_10_emails_a.json`` (columns: sender, subject, body — label optional).
+  3. Or use the built-in demo batches / reference demo files (no upload).
+"""
 
 from __future__ import annotations
 
@@ -18,33 +25,32 @@ from utils import (  # noqa: E402
     SAMPLE_BATCHES,
     df_to_csv_bytes,
     emails_from_dataframe,
-    get_drift_monitor,
     get_registry,
-    list_synthetic_datasets,
     load_detector,
-    load_synthetic_csv,
-    parse_jsonl,
+    model_version_selector,
+    prediction_template_bytes,
     read_uploaded_table,
+    sidebar_status,
 )
 
-st.set_page_config(page_title='Batch Predict — AURA', layout='wide')
+st.set_page_config(page_title='Batch Predict — AURA', layout='wide', page_icon='📦')
 apply_theme()
+sidebar_status()
 page_header(
     eyebrow='Inference',
     title='Batch prediction',
-    subtitle='Score many emails at once from sample batches, synthetic _datasets, or your own multi-file uploads.',
+    subtitle='Score many emails from an imported CSV/JSON file or the built-in in-memory demo batches.',
 )
 
 registry = get_registry()
-versions = registry.list_versions()
-if not versions:
-    st.error('No model versions available.')
+if not registry.list_versions():
+    st.error('No model versions available. Register one on the Model Management page.')
     st.stop()
 
 with st.sidebar:
-    st.header('Batch configuration')
-    active = registry.active_version() or versions[-1]
-    version = st.selectbox('Model version', versions, index=versions.index(active))
+    st.header('Configuration')
+    version = model_version_selector('Model version', key='batch_model')
+    st.caption(f'Scoring with **{version}**.')
     threshold = st.slider('Decision threshold', 0.0, 1.0, 0.75, 0.01)
     use_zone = st.toggle('Three-zone classification', value=True)
     if use_zone:
@@ -53,64 +59,26 @@ with st.sidebar:
     else:
         review_low = review_high = None
     use_calibrator = st.toggle('Apply calibrator', value=False)
-    record_drift = st.toggle('Record to drift monitor', value=False)
 
 # ── Source ─────────────────────────────────────────────────────────────────
 st.subheader('Choose a source')
+st.download_button('⬇ Download CSV template (sender, subject, body)',
+                   data=prediction_template_bytes(),
+                   file_name='predict_template.csv', mime='text/csv')
 source = st.radio(
     'Source',
-    ['Sample batches', 'Synthetic dataset', 'Upload files', 'Paste JSON / JSONL'],
+    ['Upload file (CSV / JSON)', 'Demo batches (in-memory)'],
     horizontal=True, label_visibility='collapsed',
 )
 
-emails: list[dict] = []
-if source == 'Sample batches':
-    st.caption('Pre-loaded ready-to-score batches — same style as the Predict page.')
-    chosen_batches = st.multiselect(
-        'Pick one or more sample batches',
-        options=list(SAMPLE_BATCHES.keys()),
-        default=[next(iter(SAMPLE_BATCHES))],
-    )
-    if st.button('Load samples', type='primary', disabled=not chosen_batches):
-        rows = []
-        for b in chosen_batches:
-            for e in SAMPLE_BATCHES[b]:
-                rows.append({**e, '_dataset': b})
-        df = pd.DataFrame(rows)
-        st.session_state['batch_emails'] = emails_from_dataframe(df)
-        st.session_state['batch_source_df'] = df
-        st.success(f'Loaded {len(rows)} sample emails '
-                   f'across {len(chosen_batches)} batches.')
-elif source == 'Synthetic dataset':
-    available = list_synthetic_datasets()
-    if not available:
-        st.warning('No CSVs found in `_datasets/online_learning/`.')
-    else:
-        chosen = st.multiselect(
-            'Synthetic dataset(s) — pick one or more',
-            available,
-            default=[available[0]],
-        )
-        max_rows = st.slider('Rows per dataset to score', 10, 5000, 200, 10)
-        if st.button('Load dataset(s)', type='primary', disabled=not chosen):
-            frames: list[pd.DataFrame] = []
-            for name in chosen:
-                d = load_synthetic_csv(name).head(max_rows).copy()
-                d['_dataset'] = name
-                frames.append(d)
-            df = pd.concat(frames, ignore_index=True)
-            st.session_state['batch_emails'] = emails_from_dataframe(df)
-            st.session_state['batch_source_df'] = df
-            st.success(f'Loaded {len(df)} rows from {len(chosen)} dataset(s).')
-elif source == 'Upload files':
+if source == 'Upload file (CSV / JSON)':
     st.caption(
-        'Upload one or more CSV / JSON / JSONL files. Each file is read with '
-        'the same parser; rows are tagged with their source filename so '
-        'multi-dataset uploads stay distinguishable.'
+        'Import one or more CSV / JSON / JSONL files with columns '
+        '**sender, subject, body** (a `label` column is optional and enables '
+        'accuracy metrics). Rows are tagged with their source filename.'
     )
     uploaded = st.file_uploader(
-        'Email files',
-        type=['csv', 'jsonl', 'json', 'ndjson'],
+        'Email files', type=['csv', 'json', 'jsonl', 'ndjson'],
         accept_multiple_files=True,
     )
     if uploaded and st.button('Load uploaded file(s)', type='primary'):
@@ -133,50 +101,35 @@ elif source == 'Upload files':
                 st.error(f'Combined frame is missing required columns: {e}')
         for msg in errors:
             st.warning(msg)
-else:
-    placeholder = (
-        '# JSONL (one object per line):\n'
-        '{"sender":"a@b.com","subject":"hi","body":"hello"}\n'
-        '{"sender":"c@d.com","subject":"meet","body":"can we meet?"}\n'
-        '\n'
-        '# OR JSON array:\n'
-        '[{"sender":"a@b.com","subject":"hi","body":"hello"}]\n'
-        '\n'
-        '# OR a JSON object grouping multiple _datasets:\n'
-        '{"phishing":[{...}], "legit":[{...}]}'
+
+else:  # Demo batches (in-memory)
+    st.caption('Pre-loaded in-memory batches — no files required.')
+    chosen_batches = st.multiselect(
+        'Pick one or more demo batches',
+        options=list(SAMPLE_BATCHES.keys()),
+        default=[next(iter(SAMPLE_BATCHES))],
     )
-    text = st.text_area('JSON / JSONL', height=220, placeholder=placeholder)
-    if st.button('Parse', type='primary'):
-        try:
-            records = parse_jsonl(text)
-            df = pd.DataFrame(records)
-            st.session_state['batch_emails'] = emails_from_dataframe(df)
-            st.session_state['batch_source_df'] = df
-            datasets_seen = (
-                df['_dataset'].nunique() if '_dataset' in df.columns else 1
-            )
-            st.success(
-                f'Parsed {len(records)} emails '
-                f'(across {datasets_seen} dataset section'
-                f'{"s" if datasets_seen != 1 else ""}).'
-            )
-        except Exception as e:  # noqa: BLE001
-            st.error(f'Could not parse: {e}')
+    if st.button('Load demo batches', type='primary', disabled=not chosen_batches):
+        rows = []
+        for b in chosen_batches:
+            for e in SAMPLE_BATCHES[b]:
+                rows.append({**e, '_dataset': b})
+        df = pd.DataFrame(rows)
+        st.session_state['batch_emails'] = emails_from_dataframe(df)
+        st.session_state['batch_source_df'] = df
+        st.success(f'Loaded {len(rows)} demo emails across {len(chosen_batches)} batches.')
 
 emails = st.session_state.get('batch_emails', [])
 if not emails:
     st.info('Load a source above to enable scoring.')
     st.stop()
 
-st.caption(f'{len(emails)} emails ready to score.')
+st.caption(f'**{len(emails)}** emails ready to score with `{version}`.')
 if not st.button('Run batch predict', type='primary', use_container_width=True):
     st.stop()
 
 # ── Run batch ──────────────────────────────────────────────────────────────
 detector = load_detector(version, review_low, review_high, use_calibrator)
-if record_drift:
-    detector.drift_monitor = get_drift_monitor()
-
 with st.spinner(f'Scoring {len(emails)} emails…'):
     results = detector.predict_batch(emails, threshold=threshold)
 
@@ -195,6 +148,7 @@ for src, r, ds in zip(emails, results, dataset_tags):
         'subject': src.get('subject', '')[:60],
         'true_label': src.get('label'),
         'predicted_label': r.predicted_label,
+        'verdict': 'PHISHING' if r.predicted_label == 1 else 'LEGITIMATE',
         'phish_prob': r.phishing_probability,
         'legit_prob': r.legitimate_probability,
         'zone': r.confidence_zone.value if r.confidence_zone else None,
@@ -215,7 +169,7 @@ if 'true_label' in out.columns and out['true_label'].notna().any():
     n_labelled = out['true_label'].notna().sum()
     c4.metric('Accuracy (labelled)', f'{accurate / n_labelled:.3f}')
 else:
-    c4.metric('Accuracy', '—')
+    c4.metric('Accuracy', '—', help='Add a `label` column to compute accuracy.')
 
 # ── Charts ─────────────────────────────────────────────────────────────────
 left, right = st.columns(2)
@@ -234,46 +188,31 @@ with right:
         zone_counts = out['zone'].value_counts().reset_index()
         zone_counts.columns = ['zone', 'count']
         fig = px.bar(zone_counts, x='zone', y='count', color='zone',
-                     color_discrete_map={
-                         'SPAM': '#e74c3c',
-                         'NOT_SPAM': '#2ecc71',
-                         'REVIEW': '#f39c12',
-                     },
+                     color_discrete_map={'SPAM': '#F87171', 'NOT_SPAM': '#34D399',
+                                         'REVIEW': '#FBBF24'},
                      title='Zone distribution')
         st.plotly_chart(fig, use_container_width=True)
     else:
-        label_counts = out['predicted_label'].value_counts().reset_index()
-        label_counts.columns = ['label', 'count']
-        label_counts['label'] = label_counts['label'].map(
-            {0: 'LEGITIMATE', 1: 'PHISHING'})
-        fig = px.bar(label_counts, x='label', y='count', color='label',
-                     color_discrete_map={
-                         'PHISHING': '#e74c3c', 'LEGITIMATE': '#2ecc71'},
-                     title='Label distribution')
+        label_counts = out['verdict'].value_counts().reset_index()
+        label_counts.columns = ['verdict', 'count']
+        fig = px.bar(label_counts, x='verdict', y='count', color='verdict',
+                     color_discrete_map={'PHISHING': '#F87171', 'LEGITIMATE': '#34D399'},
+                     title='Verdict distribution')
         st.plotly_chart(fig, use_container_width=True)
 
-# ── Per-dataset breakdown when multiple sources are mixed in ──────────────
+# ── Per-dataset breakdown when multiple sources are mixed in ───────────────
 if multi_dataset:
     st.markdown('### Per-dataset breakdown')
     per_ds = (
         out
         .assign(predicted_phish=lambda d: (d['predicted_label'] == 1).astype(int))
         .groupby('dataset')
-        .agg(
-            rows=('predicted_label', 'size'),
-            phish_rate=('predicted_phish', 'mean'),
-            mean_phish_prob=('phish_prob', 'mean'),
-        )
+        .agg(rows=('predicted_label', 'size'),
+             phish_rate=('predicted_phish', 'mean'),
+             mean_phish_prob=('phish_prob', 'mean'))
         .reset_index()
     )
     st.dataframe(per_ds, hide_index=True, use_container_width=True)
-    fig = px.histogram(
-        out, x='phish_prob', color='dataset', barmode='overlay',
-        opacity=0.55, nbins=40,
-        title='Phishing-probability distribution per dataset',
-    )
-    fig.add_vline(x=threshold, line_dash='dash', line_color='red')
-    st.plotly_chart(fig, use_container_width=True)
 
 # ── Confusion matrix when labels available ─────────────────────────────────
 if 'true_label' in out.columns and out['true_label'].notna().any():
@@ -284,22 +223,18 @@ if 'true_label' in out.columns and out['true_label'].notna().any():
         labelled['true_label'], labelled['predicted_label'],
         rownames=['true'], colnames=['predicted'], dropna=False,
     ).reindex(index=[0, 1], columns=[0, 1], fill_value=0)
-    fig = px.imshow(
-        cm.values, text_auto=True,
-        x=['pred 0', 'pred 1'], y=['true 0', 'true 1'],
-        color_continuous_scale='Blues',
-        title=f'{len(labelled)} labelled emails',
-    )
+    fig = px.imshow(cm.values, text_auto=True,
+                    x=['pred 0', 'pred 1'], y=['true 0', 'true 1'],
+                    color_continuous_scale='Blues',
+                    title=f'{len(labelled)} labelled emails')
     st.plotly_chart(fig, use_container_width=True)
 
-# ── Table + download ──────────────────────────────────────────────────────
+# ── Table + download ───────────────────────────────────────────────────────
 st.markdown('### Per-email results')
 st.dataframe(out, hide_index=True, use_container_width=True, height=420)
 st.download_button(
-    'Download results CSV',
-    data=df_to_csv_bytes(out),
-    file_name='aura_batch_predictions.csv',
-    mime='text/csv',
+    'Download results CSV', data=df_to_csv_bytes(out),
+    file_name='aura_batch_predictions.csv', mime='text/csv',
 )
 
 footer()

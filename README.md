@@ -16,9 +16,11 @@ package. Parity between the two is enforced by a golden fixture at
 1. [What AURA does](#1-what-aura-does)
 2. [Repository layout](#2-repository-layout)
 3. [Training data](#3-training-data)
+   - [The corpus is not in this repository](#the-corpus-is-not-in-this-repository)
 4. [Training pipeline](#4-training-pipeline)
 5. [Model selection and calibration](#5-model-selection-and-calibration)
 6. [Setup and installation](#6-setup-and-installation)
+   - [Getting the trained artefacts](#getting-the-trained-artefacts)
 7. [The `scripts/` folder](#7-the-scripts-folder)
 8. [The `inference/` package](#8-the-inference-package)
    - [Architecture](#81-architecture)
@@ -152,6 +154,34 @@ used during training.
 
 All corpora are from the 2007–2008 era. This temporal gap is the reason the
 `scripts/` folder exists — see [§7](#7-the-scripts-folder).
+
+### The corpus is not in this repository
+
+`datasets/` is gitignored, so a fresh clone has **no training data** and the
+notebooks in [§4](#4-training-pipeline) cannot be run as-is. Only the small
+benchmark and demo sets under `investigation/_datasets/` are tracked.
+
+To re-train, download the bundle from
+[Zenodo 8339691](https://zenodo.org/records/8339691) yourself and place the
+eight CSVs where `01.combine_dataset.ipynb` expects them:
+
+```
+datasets/raw/CEAS_08.csv
+datasets/raw/Nazario.csv
+datasets/raw/Nazario_2.csv
+datasets/raw/Nazario_5.csv
+datasets/raw/Nigerian_5.csv
+datasets/raw/Nigerian_Fraud.csv
+datasets/raw/SpamAssasin.csv
+datasets/raw/TREC_07.csv
+```
+
+Notebook `01` writes `datasets/processed/combined_dataset.csv`; the later
+notebooks chain from there.
+
+**You do not need any of this to run AURA.** Re-training is only for changing
+the model itself — to run the platform, pull the pre-trained artefacts with
+`scripts/fetch_artefacts.py` (see [§6](#6-setup-and-installation)).
 
 ---
 

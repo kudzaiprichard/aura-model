@@ -16,7 +16,7 @@ package. Parity between the two is enforced by a golden fixture at
 1. [What AURA does](#1-what-aura-does)
 2. [Repository layout](#2-repository-layout)
 3. [Training data](#3-training-data)
-   - [The corpus is not in this repository](#the-corpus-is-not-in-this-repository)
+   - [Getting the training corpus](#getting-the-training-corpus)
 4. [Training pipeline](#4-training-pipeline)
 5. [Model selection and calibration](#5-model-selection-and-calibration)
 6. [Setup and installation](#6-setup-and-installation)
@@ -148,6 +148,9 @@ The dataset bundles eight CSV files that are loaded individually in notebook
 | TREC_07.csv | 53,757 | 29,399 phishing / 24,358 legitimate |
 | **Total** | **114,578** | |
 
+That total counts the Nazario slice twice — see
+[the duplicate note](#a-duplicate-in-the-source-list) below; **112,013** rows are distinct.
+
 All files share a common schema: `sender`, `receiver`, `date`, `subject`,
 `body`, `label`, `urls`. The `receiver`, `date`, and `urls` columns are not
 used during training.
@@ -155,33 +158,74 @@ used during training.
 All corpora are from the 2007–2008 era. This temporal gap is the reason the
 `scripts/` folder exists — see [§7](#7-the-scripts-folder).
 
-### The corpus is not in this repository
+### Getting the training corpus
 
 `datasets/` is gitignored, so a fresh clone has **no training data** and the
 notebooks in [§4](#4-training-pipeline) cannot be run as-is. Only the small
 benchmark and demo sets under `investigation/_datasets/` are tracked.
 
-To re-train, download the bundle from
-[Zenodo 8339691](https://zenodo.org/records/8339691) yourself and place the
-eight CSVs where `01.combine_dataset.ipynb` expects them:
+**You do not need the corpus to run AURA.** It is required only to re-train or
+re-derive the feature pipeline. To run the platform, pull the pre-trained
+artefacts with `scripts/fetch_artefacts.py` (see
+[§6](#6-setup-and-installation)) and skip this section entirely.
 
+There are two sources. Zenodo is the record of origin and the one to cite; the
+Hugging Face dataset is a verbatim mirror we maintain so the pipeline still
+works if Zenodo is unreachable.
+
+| Source | Use |
+|---|---|
+| [Zenodo 8339691](https://zenodo.org/records/8339691) | Origin, DOI-citable, all 11 CSVs |
+| [`kudzaiprichard/aura-phishing-email-corpus`](https://huggingface.co/datasets/kudzaiprichard/aura-phishing-email-corpus) | Mirror of the 7 CSVs AURA uses, byte-identical |
+
+From the mirror:
+
+```bash
+pip install huggingface_hub
+python - <<'EOF'
+from huggingface_hub import hf_hub_download
+import shutil, pathlib
+REPO = "kudzaiprichard/aura-phishing-email-corpus"
+DEST = pathlib.Path("datasets/raw"); DEST.mkdir(parents=True, exist_ok=True)
+for name in ["CEAS_08.csv", "Nazario.csv", "Nazario_5.csv", "Nigerian_5.csv",
+             "Nigerian_Fraud.csv", "SpamAssasin.csv", "TREC_07.csv"]:
+    shutil.copy(hf_hub_download(REPO, name, repo_type="dataset"), DEST / name)
+EOF
 ```
-datasets/raw/CEAS_08.csv
-datasets/raw/Nazario.csv
-datasets/raw/Nazario_2.csv
-datasets/raw/Nazario_5.csv
-datasets/raw/Nigerian_5.csv
-datasets/raw/Nigerian_Fraud.csv
-datasets/raw/SpamAssasin.csv
-datasets/raw/TREC_07.csv
+
+Or from Zenodo directly — the API serves files unauthenticated and publishes an
+MD5 per file at `https://zenodo.org/api/records/8339691/files`:
+
+```bash
+mkdir -p datasets/raw && cd datasets/raw
+for f in CEAS_08 Nazario Nazario_5 Nigerian_5 Nigerian_Fraud SpamAssasin TREC_07; do
+  curl -fL -o "$f.csv" "https://zenodo.org/api/records/8339691/files/$f.csv/content"
+done
 ```
 
-Notebook `01` writes `datasets/processed/combined_dataset.csv`; the later
-notebooks chain from there.
+Either way notebook `01` reads `datasets/raw/*.csv` and writes
+`datasets/processed/combined_dataset.csv`; the later notebooks chain from there.
 
-**You do not need any of this to run AURA.** Re-training is only for changing
-the model itself — to run the platform, pull the pre-trained artefacts with
-`scripts/fetch_artefacts.py` (see [§6](#6-setup-and-installation)).
+#### A duplicate in the source list
+
+`01.combine_dataset.ipynb` loads eight files, but only seven distinct ones
+exist. `Nazario_2.csv` is a **byte-identical copy** of `Nazario.csv` (both MD5
+`4022d055bb7...`, 7,811,841 bytes) and is not part of the Zenodo record. Loading
+both ingests that 1,565-email phishing slice twice, which is where the
+frequently quoted corpus size of 114,578 rows comes from — the true count of
+distinct rows is **112,013**, and the phishing class is correspondingly
+over-weighted in anything trained on it.
+
+Neither source ships `Nazario_2.csv`. To reproduce the historical combined
+dataset exactly, duplicate it yourself after downloading:
+
+```bash
+cp datasets/raw/Nazario.csv datasets/raw/Nazario_2.csv
+```
+
+To train on distinct rows instead, drop `Nazario_2.csv` from the source list in
+notebook `01` and leave the file absent. That changes the class balance, so
+metrics will not be comparable with `v1_0`.
 
 ---
 

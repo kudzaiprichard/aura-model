@@ -1,10 +1,27 @@
+# AURA inference dashboard — native Streamlit theme.
+# Theming every widget through Streamlit's own variables (rather than brute-force
+# CSS) keeps dropdowns, popovers, sliders and tooltips consistent and flicker-free.
 [theme]
 base = "dark"
-primaryColor = "#3B82F6"
-backgroundColor = "#0B1120"
-secondaryBackgroundColor = "#111827"
-textColor = "#F1F5F9"
-font = "sans serif"
+
+# Indigo / electric-blue accent (primary actions, focus rings, active nav).
+primaryColor = "#4F7CFF"
+
+# Surface ramp: base canvas → panels / sidebar / inputs.
+backgroundColor = "#0B0F17"
+secondaryBackgroundColor = "#131A24"
+
+textColor = "#E6EAF0"
+linkColor = "#7AA2FF"
+
+# Compact, enterprise density.
+borderColor = "#243042"
+showWidgetBorder = true
+baseRadius = "0.5rem"
+baseFontSize = 14
+
+font = "sans-serif"
+codeFont = "monospace"
 
 [browser]
 gatherUsageStats = false

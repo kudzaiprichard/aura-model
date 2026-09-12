@@ -326,6 +326,41 @@ and Plotly:
 pip install streamlit plotly
 ```
 
+### Getting the trained artefacts
+
+Trained artefacts are **not** tracked in git — `models/` and `*.pkl` are
+gitignored, so a fresh clone has no detector and `aura_api` will boot with every
+prediction endpoint returning 503. Pull the published set instead:
+
+```bash
+python scripts/fetch_artefacts.py                    # -> ./models
+python scripts/fetch_artefacts.py --dest ../aura_api/models
+python scripts/fetch_artefacts.py --force            # replace an existing set
+```
+
+The script is standard-library only — no `pip install` needed first. It downloads
+[release `v1`](https://github.com/kudzaiprichard/aura-model/releases/tag/v1),
+verifies the archive's SHA-256, and extracts this layout:
+
+```
+models/model_metadata.json                                  registry index, active = v1_0
+models/pipeline_components/subject_vectorizer.pkl
+models/pipeline_components/body_vectorizer.pkl
+models/pipeline_components/calibrator.pkl
+models/v1_0/production/phishing_detector_mlp_classifier.pkl
+models/v1_0/production/model_metadata.json
+models/v1_0/production/winner_summary.txt
+```
+
+Re-running is a no-op once the artefacts are in place. Point the backend at the
+directory with `AURA_MODELS_DIR=/abs/path/to/models`.
+
+Publishing a new set: zip the artefact root so `model_metadata.json`,
+`pipeline_components/` and `v<major>_<minor>/` sit at the archive root (use
+forward slashes — a Windows-built zip with backslash entries will not extract
+correctly on macOS or Linux), attach it to a new release, then update
+`RELEASE_TAG`, `ASSET` and `SHA256` at the top of `scripts/fetch_artefacts.py`.
+
 **Model resolution.** `PhishingDetector.load_production()` and
 `ModelRegistry` locate the `models/` directory using the following precedence:
 
